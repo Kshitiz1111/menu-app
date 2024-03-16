@@ -1,10 +1,10 @@
-export type Dish ={
+export type DishType ={
    id?: string,
    name: string|undefined,
    imgSrc: string,
    price: number|undefined,
-   qty?: number,
-   ingredients?:{
+   qty: number,
+   ingredient:{
       baseIngredients: string[],
       customIngredients?: CustomIngredient[]|null|undefined,
    }
@@ -30,7 +30,7 @@ interface Filter {
    dietType: string,
 }
 // combo dish
-export type ComboDish ={
+export type ComboDishType ={
    id?: string,
    name: string,
    description: string,
