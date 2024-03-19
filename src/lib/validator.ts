@@ -6,7 +6,7 @@ export const ProductFormSchema = z.object({
    product_category: z.string(),
    product_type: z.string(),
    diet_type: z.string(),
-   product_img: z.string(),
+   product_img: z.string().or(z.undefined()),
    product_name: z.string().min(2, {
       message: "Product name must be at least 3 characters."
    }).max(20,{
@@ -21,7 +21,7 @@ export const ProductFormSchema = z.object({
       z.array(
          z.object({
             ing_name:z.string(),
-            ing_qty:z.number(), 
+            ing_qty:z.number().or(z.string()), 
             ing_unit:z.string(),
             custom_marker:z.optional(z.boolean()),
          })
@@ -31,9 +31,9 @@ export const ProductFormSchema = z.object({
       z.array(
          z.object({
             ing_name:z.string(),
-            ing_qty:z.number(), 
+            ing_qty:z.number().or(z.string()), 
             ing_unit:z.string(),
-            ing_price:z.number()
+            ing_price:z.number().or(z.string())
          })
       )
    )

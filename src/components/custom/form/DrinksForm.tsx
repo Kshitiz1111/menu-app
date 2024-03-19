@@ -3,10 +3,15 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ProductFormSchema } from '@/lib/validator'
-import React from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import React, { useEffect, useState } from 'react'
+import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-const DrinksForm = ({ form, isCombo }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, isCombo: boolean }) => {
+const DrinksForm = ({ form, isCombo, baseFields, appendBase, removeBase }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, isCombo: boolean, baseFields: any, appendBase: any, removeBase: any, }) => {
+   let checkBoxValue = false;
+   const [image, setImage] = useState<File>();
+   useEffect(() => { form.setValue("product_img", image ? image.name : undefined) }, [image])
+
+   console.log('basefield', baseFields);
    return (
       <>
          <div className="flex justify-between flex-col gap-5 md:flex-row">
@@ -17,7 +22,7 @@ const DrinksForm = ({ form, isCombo }: { form: UseFormReturn<z.infer<typeof Prod
                   <FormItem className="w-full">
                      <FormLabel>Product Picture</FormLabel>
                      <FormControl>
-                        <Input className="w-full" type="file" {...field} />
+                        <Input className="w-full" type="file" onChange={(e) => setImage(e.target.files ? e.target.files[0] : undefined)} />
                      </FormControl>
                      <FormMessage />
                   </FormItem>
@@ -61,27 +66,54 @@ const DrinksForm = ({ form, isCombo }: { form: UseFormReturn<z.infer<typeof Prod
                      <FormLabel>Base Ingredient(optional)</FormLabel>
                      <FormControl>
                         <div className="flex flex-col flex-wrap gap-4">
-                           <div className="flex items-center gap-1">
-                              <Input type="text" placeholder="name" name='ing_name' />
-                              <Input type="number" placeholder="qty" name='ing_qty' className="w-1/4" />
-                              <Input type="text" placeholder="unit" name='ing_unit' className="w-1/4" />
+                           {baseFields.map((field: any, index: any) => (
+                              <div className='relative mt-1'>
+                                 <div className='gap-1'>
+                                    {(baseFields.length !== 0 && baseFields.length - 1 !== index) ?
+                                       <div key={field.id} className="flex items-center px-1">
+                                          <div className='flex items-center'><span className='text-sm font-semibold'>name: </span><Input className='bg-gray-200 ' type="text" placeholder="name"  {...form.register(`base_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} /></div>
+                                          <div className='flex items-center'><span className='text-sm font-semibold'>quantity: </span><Input className='bg-gray-200 ' type="number" placeholder="qty" {...form.register(`base_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} /></div>
+                                          <div className='flex items-center'><span className='text-sm font-semibold'>unit: </span><Input className='bg-gray-200 ' type="text" placeholder="unit" {...form.register(`base_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} /></div>
+                                       </div>
+                                       :
+                                       <div key={field.id} className="flex items-center gap-1">
+                                          <Input type="text" placeholder="name" {...form.register(`base_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
+                                          <Input type="number" placeholder="qty" {...form.register(`base_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/4" />
+                                          <Input type="text" placeholder="unit" {...form.register(`base_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/4" />
+                                       </div>
 
-                           </div>
-                           <Button>add</Button>
+                                    }
+                                    {(baseFields.length === 0 || index === baseFields.length - 1) ?
+                                       ""
+                                       : <button
+                                          type="button"
+                                          className='bg-red-500 p-1 rounded-md w-full hover:shadow-md text-white'
+                                          onClick={() => baseFields.length > 1 && removeBase(index)}
+                                       >Delete</button>
+                                    }
+
+                                 </div>
+
+
+
+                              </div>
+                           ))}
+
+                           <Button
+                              type='button'
+                              onClick={() => {
+                                 let newBaseIngredient = { ing_name: '', ing_qty: 0, ing_unit: '', custom_marker: checkBoxValue };
+                                 appendBase(newBaseIngredient);
+                              }}
+
+                           >add</Button>
                         </div>
                      </FormControl>
                      <FormMessage />
                   </FormItem>
                )}
             />
-            {
-               <div>
-                  <p className='font-semibold text-sm'>Selected Base Ingredient </p>
-                  <ul className='p-2 list-decimal'>
-                     <li className='font-semibold mx-2'>name<span className='p-1 mx-2 rounded-md bg-red-400 text-white text-center cursor-pointer hover:shadow-md'>delete</span></li>
-                  </ul>
-               </div>
-            }
+
          </div>
          {isCombo &&
             <div className="flex flex-col gap-5 w-full md:flex-row">

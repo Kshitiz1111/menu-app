@@ -9,27 +9,22 @@ import React, { useEffect, useState } from 'react'
 import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const RegularDishForm = ({ form, hideCustom }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, hideCustom: boolean }) => {
-   const { register, control, watch, handleSubmit, setValue, formState: { errors } } = useForm({
-      defaultValues: {
-         base_ingredient: [{ ing_name: '', ing_qty: 1, ing_unit: '', custom_marker: false }],
-         custom_ingredient: [{ ing_name: '', ing_qty: 1, ing_unit: '', ing_price: 0 }],
+const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase, customFields, appendCustom, removeCustom }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, hideCustom: boolean, baseFields: any, appendBase: any, removeBase: any, customFields: any, appendCustom: any, removeCustom: any }) => {
+   let [checkBoxValue, setCheckBoxValue] = useState<boolean>(false);
+   const [image, setImage] = useState<File>();
 
-      },
-   });
+   const watchedBaseIngredients = form.watch('base_ingredient');
+   const watchedCustomIngredients = form.watch('custom_ingredient');
 
-   const { fields: baseFields, append: appendBase, remove: removeBase } = useFieldArray({
-      control,
-      name: 'base_ingredient',
-   });
-   const watchedBaseIngredients = watch('base_ingredient');
+   useEffect(() => {
+      if (watchedBaseIngredients) {
+         form.setValue(`base_ingredient.${watchedBaseIngredients?.length - 1}.custom_marker`, checkBoxValue);
+      }
+      form.setValue("product_img", image ? image.name : undefined)
+   }, [checkBoxValue, watchedBaseIngredients, image])
 
-   console.log(watchedBaseIngredients)
-   const { fields: customFields, append: appendCustom, remove: removeCustom } = useFieldArray({
-      control,
-      name: 'custom_ingredient',
-   });
-
+   // console.log(watchedBaseIngredients, checkBoxValue)
+   // console.log(watchedCustomIngredients)
    return (
       <>
          <div className="flex justify-between flex-col gap-5 md:flex-row">
@@ -40,7 +35,11 @@ const RegularDishForm = ({ form, hideCustom }: { form: UseFormReturn<z.infer<typ
                   <FormItem className="w-full">
                      <FormLabel>Product Picture</FormLabel>
                      <FormControl>
-                        <Input className="w-full" type="file" {...field} />
+                        <Input
+                           className="w-full"
+                           type="file"
+                           onChange={(e) => setImage(e.target.files ? e.target.files[0] : undefined)}
+                        />
                      </FormControl>
                      <FormMessage />
                   </FormItem>
@@ -75,54 +74,95 @@ const RegularDishForm = ({ form, hideCustom }: { form: UseFormReturn<z.infer<typ
                )}
             />
          </div>
-         <div className="flex flex-col gap-5 w-full md:flex-row">
+         <div className="flex flex-col gap-10 w-full md:flex-row">
             <FormField
                control={form.control}
                name="base_ingredient"
                render={({ field }) => (
-                  <FormItem className='md:w-2/4'>
+                  <FormItem className=''>
                      <FormLabel>Base Ingredient</FormLabel>
                      <FormControl>
                         <div className="flex flex-col flex-wrap gap-4">
-                           {baseFields.map((field, index) => (
-                              <>
-                                 <div key={field.id} className="flex items-center gap-1">
-                                    <Input type="text" placeholder="name" {...register(`base_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
-                                    <Input type="number" placeholder="qty" {...register(`base_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/4" />
-                                    <Input type="text" placeholder="unit" {...register(`base_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/4" />
+                           {baseFields.map((field: any, index: any) => (
+                              <div className='relative mt-1'>
+                                 <div className='gap-1'>
+                                    {(baseFields.length !== 0 && baseFields.length - 1 !== index) ?
+                                       <div key={field.id} className="flex items-center px-1">
+                                          <div className='flex items-center'><span className='text-sm font-semibold'>name: </span><Input className='bg-gray-200 ' type="text" placeholder="name" {...form.register(`base_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} /></div>
+                                          <div className='flex items-center'><span className='text-sm font-semibold'>quantity: </span><Input className='bg-gray-200 ' type="number" placeholder="qty" {...form.register(`base_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} /></div>
+                                          <div className='flex items-center'><span className='text-sm font-semibold'>unit: </span><Input className='bg-gray-200 ' type="text" placeholder="unit" {...form.register(`base_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} /></div>
+                                       </div>
+                                       :
+                                       <div key={field.id} className="flex items-center gap-1">
+                                          <Input type="text" placeholder="name" {...form.register(`base_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
+                                          <Input type="number" placeholder="qty" {...form.register(`base_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/4" />
+                                          <Input type="text" placeholder="unit" {...form.register(`base_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/4" />
+                                       </div>
 
-                                    <button type="button" onClick={() => baseFields.length > 1 && removeBase(index)}>Delete</button>
+                                    }
+                                    {(baseFields.length === 0 || index === baseFields.length - 1) ?
+                                       ""
+                                       : <button
+                                          type="button"
+                                          className='bg-red-500 p-1 rounded-md w-full hover:shadow-md text-white'
+                                          onClick={() => baseFields.length > 1 && removeBase(index)}
+                                       >Delete</button>
+                                    }
+
                                  </div>
-                                 {!hideCustom && <div className='flex gap-2 items-center'>
-                                    <Checkbox className='w-5 h-5' {...register(`base_ingredient.${index}.custom_marker`)} />
-                                    <FormDescription>mark as customizable</FormDescription>
-                                 </div>}
 
-                              </>
+                                 {!hideCustom
+                                    &&
+                                    <>
+                                       {(baseFields.length > 0 && index === baseFields.length - 1) ?
+
+                                          <div className='flex gap-2 m-1 items-center'>
+
+                                             <Checkbox
+                                                className='w-5 h-5'
+                                                onClick={() => setCheckBoxValue(!checkBoxValue)}
+                                                {...form.register(`base_ingredient.${index}.custom_marker`)}
+                                             />
+                                             <FormDescription>mark as customizable</FormDescription>
+                                          </div>
+                                          : (watchedBaseIngredients && watchedBaseIngredients[index].custom_marker) ?
+                                             <FormDescription className='absolute -top-5 right-0 font-semibold '>marked as customizable</FormDescription>
+                                             : ""
+                                       }
+                                    </>
+
+                                 }
+
+                              </div>
                            ))}
-
-
-
 
                            <Button
                               type='button'
                               onClick={() => {
-                                 let newBaseIngredient = { ing_name: '', ing_qty: 1, ing_unit: '', custom_marker: false };
+                                 if (watchedBaseIngredients) {
+                                    if (watchedBaseIngredients.length > 0) {
+                                       let newBaseIngredient = { ing_name: '', ing_qty: 0, ing_unit: '', custom_marker: checkBoxValue };
 
-                                 // Check if the custom_marker of the last added item is true
-                                 if (watchedBaseIngredients[watchedBaseIngredients.length - 1].custom_marker) {
-                                    appendCustom({
-                                       ing_name: newBaseIngredient.ing_name,
-                                       ing_qty: newBaseIngredient.ing_qty,
-                                       ing_unit: newBaseIngredient.ing_unit,
-                                       ing_price: 0,
-                                    });
-                                 } else {
-                                    console.log("hldf")
-                                    appendBase(newBaseIngredient);
+                                       // Check if the custom_marker of the last added item is true
+                                       console.log(watchedBaseIngredients.length)
+                                       if (checkBoxValue) {
+                                          console.log("both")
+                                          appendCustom({
+                                             ing_name: watchedBaseIngredients[watchedBaseIngredients.length - 1].ing_name,
+                                             ing_qty: watchedBaseIngredients[watchedBaseIngredients.length - 1].ing_qty,
+                                             ing_unit: watchedBaseIngredients[watchedBaseIngredients.length - 1].ing_unit,
+                                             ing_price: 0,
+                                          });
+                                          appendBase({ ...newBaseIngredient, custom_marker: checkBoxValue });
+                                          setCheckBoxValue(!checkBoxValue);
+                                       } else {
+                                          console.log("hldf")
+                                          appendBase(newBaseIngredient);
+                                       }
+                                    }
                                  }
-                              }
-                              }
+                              }}
+
                            >add</Button>
                         </div>
                      </FormControl>
@@ -131,31 +171,65 @@ const RegularDishForm = ({ form, hideCustom }: { form: UseFormReturn<z.infer<typ
                )}
             />
 
-         </div>
-         {!hideCustom &&
-            <div className="flex flex-col gap-5 md:flex-row">
+
+            {!hideCustom &&
                <FormField
                   control={form.control}
                   name="custom_ingredient"
                   render={({ field }) => (
-                     <FormItem className='md:w-2/4'>
+                     <FormItem className=''>
                         <FormLabel>Customizable Ingredient (optional)</FormLabel>
                         <FormControl>
                            <div className="flex flex-col flex-wrap gap-4">
                               <FormDescription>enter price for 1 unit(eg: name=onion qty=1 unit=slice price=2)  </FormDescription>
-                              {customFields.map((field, index) => (
+                              {customFields.map((field: any, index: any) => (
                                  <div className='flex flex-wrap items-center justify-center'>
+
                                     <div key={field.id} className="flex items-center gap-1">
-                                       <Input type="text" placeholder="name" {...register(`custom_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
-                                       <Input type="number" placeholder="qty" {...register(`custom_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/4" readOnly />
-                                       <Input type="text" placeholder="unit" {...register(`custom_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/4" />
-                                       <Input type="number" placeholder="price" {...register(`custom_ingredient.${index}.ing_price`)} defaultValue={field.ing_price} className="w-1/4" />
+                                       {(customFields.length !== 0 && customFields.length - 1 !== index) ?
+                                          <div key={field.id} className="flex items-center px-1">
+                                             <div className='flex items-center'>
+                                                <span className='text-sm font-semibold'>name: </span>
+                                                <Input className='bg-gray-200 ' type="text" placeholder="name" {...form.register(`custom_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
+                                             </div>
+                                             <div className='flex items-center'>
+                                                <span className='text-sm font-semibold'>quantity: </span>
+                                                <Input className='bg-gray-200 ' type="number" placeholder="qty" {...form.register(`custom_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} readOnly />
+                                             </div>
+                                             <div className='flex items-center'>
+                                                <span className='text-sm font-semibold'>unit: </span>
+                                                <Input className='bg-gray-200 ' type="text" placeholder="unit" {...form.register(`custom_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} />
+                                             </div>
+                                             <div className='flex items-center'>
+                                                <span className='text-sm font-semibold'>price: </span>
+                                                <Input className='bg-gray-200 ' type="number" placeholder="price" {...form.register(`custom_ingredient.${index}.ing_price`)} defaultValue={field.ing_price} />
+                                             </div>
+
+                                          </div>
+                                          :
+                                          <div key={field.id} className="flex items-center gap-1">
+                                             <Input type="text" placeholder="name" {...form.register(`custom_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
+                                             <Input type="number" placeholder="qty" {...form.register(`custom_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/4" readOnly />
+                                             <Input type="text" placeholder="unit" {...form.register(`custom_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/4" />
+                                             <Input type="number" placeholder="price" {...form.register(`custom_ingredient.${index}.ing_price`)} defaultValue={field.ing_price} className="w-1/4" />
+                                          </div>
+
+                                       }
+
                                     </div>
-                                    <button
-                                       type="button"
-                                       onClick={() => customFields.length > 1 && removeCustom(index)}
-                                       className='bg-red-500 0 p-1 rounded-md m-1 w-full hover:shadow-md text-white'
-                                    >Delete</button>
+                                    {(customFields.length === 0 || index === customFields.length - 1) ?
+                                       ""
+                                       : <button
+                                          type="button"
+                                          className='bg-red-500 0 p-1 rounded-md m-1 w-full hover:shadow-md text-white'
+                                          onClick={() => customFields.length > 1 && removeCustom(index)}
+                                       >Delete</button>
+                                    }
+                                    {/* <button
+                                          type="button"
+                                          onClick={() => customFields.length > 1 && removeCustom(index)}
+                                          className='bg-red-500 0 p-1 rounded-md m-1 w-full hover:shadow-md text-white'
+                                       >Delete</button> */}
                                  </div>
                               ))}
 
@@ -166,9 +240,8 @@ const RegularDishForm = ({ form, hideCustom }: { form: UseFormReturn<z.infer<typ
                      </FormItem>
                   )}
                />
-
-            </div>
-         }
+            }
+         </div>
       </>
    )
 }

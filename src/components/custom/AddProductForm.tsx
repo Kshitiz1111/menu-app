@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 import { ProductFormSchema } from "@/lib/validator"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -32,15 +32,41 @@ const AddProductForm = () => {
    // 1. Define your form.
    const form = useForm<z.infer<typeof ProductFormSchema>>({
       resolver: zodResolver(ProductFormSchema),
-      // defaultValues: {
-      //    product_category: "regular",
-      //    product_type: "",
-      //    diet_type: "",
-      //    product_img: "",
-      //    product_name: "",
-      //    product_des: "",
-      // },
+      defaultValues: {
+         base_ingredient: [
+            {
+               ing_name: 'Example Ingredient',
+               ing_qty: 1, // Assuming you want to allow numbers for quantity
+               ing_unit: 'g',
+               custom_marker: false, // Optional, set to false if not used
+            },
+            // Add more default ingredients as needed
+         ],
+         custom_ingredient: [
+            {
+               ing_name: 'Example Ingredient',
+               ing_qty: 1, // Assuming you want to allow numbers for quantity
+               ing_unit: 'g',
+               ing_price: 0, // Optional, set to false if not used
+            },
+            // Add more default ingredients as needed
+         ],
+      },
    })
+
+   const { fields: baseFields, append: appendBase, remove: removeBase } = useFieldArray({
+      control: form.control,
+      name: 'base_ingredient',
+   });
+   const { fields: customFields, append: appendCustom, remove: removeCustom } = useFieldArray({
+      control: form.control,
+      name: 'custom_ingredient',
+   });
+
+   const watchedBaseIngredients = form.watch('base_ingredient');
+   console.log('watch base', watchedBaseIngredients)
+   const allValues = form.watch();
+   console.log('All form values', allValues);
 
    const handleChange = (categoryName: string, categoryValue: string, field: any) => {
       // console.log(categoryName, categoryValue);
@@ -52,10 +78,14 @@ const AddProductForm = () => {
 
    // 2. Define a submit handler.
    function onSubmit(values: z.infer<typeof ProductFormSchema>) {
-      // Do something with the form values.
-      // ✅ This will be type-safe and validated.
+      values.base_ingredient = values?.base_ingredient?.map(item => ({
+         ...item,
+         ing_qty: (typeof (item.ing_qty) === "string") ? parseFloat(item.ing_qty) : item.ing_qty,
+      }));
       console.log(values)
+
    }
+
    return (
       <div className='p-4'>
          <div className="bg-gray-200 p-2 rounded-md">
@@ -184,7 +214,12 @@ const AddProductForm = () => {
                            || pType === "main"
                            || pType === "dessert"
                         ) && pCategory === "combo")
-                           ? <ComboDishForm form={form} />
+                           ? <ComboDishForm
+                              form={form}
+                              baseFields={baseFields}
+                              appendBase={appendBase}
+                              removeBase={removeBase}
+                           />
                            :
                            ((
                               pType === "starter"
@@ -192,19 +227,49 @@ const AddProductForm = () => {
                               || pType === "dessert"
                            ) && (pCategory === "regular" || pCategory === "special"))
                               ? (pType === "dessert")
-                                 ? <RegularDishForm form={form} hideCustom={true} />
-                                 : <RegularDishForm form={form} hideCustom={false} />
+                                 ? <RegularDishForm
+                                    form={form}
+                                    hideCustom={true}
+                                    baseFields={baseFields}
+                                    appendBase={appendBase}
+                                    removeBase={removeBase}
+                                    customFields={customFields}
+                                    appendCustom={appendCustom}
+                                    removeCustom={removeCustom}
+                                 />
+                                 : <RegularDishForm
+                                    form={form}
+                                    hideCustom={false}
+                                    baseFields={baseFields}
+                                    appendBase={appendBase}
+                                    removeBase={removeBase}
+                                    customFields={customFields}
+                                    appendCustom={appendCustom}
+                                    removeCustom={removeCustom}
+                                 />
                               :
                               (
                                  pType === "drinks"
                                  && (pCategory === "regular" || pCategory === "special")
                               )
-                                 ? <DrinksForm form={form} isCombo={false} />
+                                 ? <DrinksForm
+                                    form={form}
+                                    isCombo={false}
+                                    baseFields={baseFields}
+                                    appendBase={appendBase}
+                                    removeBase={removeBase}
+                                 />
                                  :
                                  (
                                     pType === "drinks"
                                     && pCategory === "combo"
-                                 ) ? <DrinksForm form={form} isCombo={true} />
+                                 ) ? <DrinksForm
+                                    form={form}
+                                    isCombo={true}
+                                    baseFields={baseFields}
+                                    appendBase={appendBase}
+                                    removeBase={removeBase}
+                                 />
                                     : ""
 
                      }
