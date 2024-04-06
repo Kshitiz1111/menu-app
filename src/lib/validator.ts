@@ -4,6 +4,7 @@ import { object, z } from "zod"
 
 export const ProductFormSchema = z.object({
    product_category: z.string(),
+   product_price: z.number().min(1,{message:"enter valid price"}).or(z.string().min(1,{message:"price field empty"})),
    product_type: z.string(),
    diet_type: z.string(),
    product_img: z.string().or(z.undefined()),
@@ -34,6 +35,52 @@ export const ProductFormSchema = z.object({
             ing_qty:z.number().or(z.string()), 
             ing_unit:z.string(),
             ing_price:z.number().or(z.string())
+         })
+      )
+   ),
+   combo_drinks: z.optional(
+      z.array(
+         z.object({
+            name: z.string(),
+            product_type: z.string(),
+            id: z.string(),
+            img_src: z.string(),
+            description: z.string(),
+            base_ingredient: z.optional(
+               z.array(
+                  z.object({
+                    ing_name: z.string(),
+                    ing_qty: z.number().or(z.string()),
+                    ing_unit: z.string(),
+                    custom_marker: z.boolean().optional(),
+                  })
+                )
+            ),
+            total_qty: z.number(),
+            price: z.number(),
+         })
+      )
+   ),
+   combo_desserts: z.optional(
+      z.array(
+         z.object({
+            name: z.string(),
+            product_type: z.string(),
+            id: z.string(),
+            img_src: z.string(),
+            description: z.string(),
+            base_ingredient: z.optional(
+               z.array(
+                  z.object({
+                    ing_name: z.string(),
+                    ing_qty: z.number().or(z.string()),
+                    ing_unit: z.string(),
+                    custom_marker: z.boolean().optional(),
+                  })
+                )
+            ),
+            total_qty: z.number(),
+            price: z.number(),
          })
       )
    )

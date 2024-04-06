@@ -6,10 +6,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { ProductFormSchema } from '@/lib/validator'
 import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import ChooseDrinkModule from './ChooseDrinkModule'
+import ChooseDessertModule from './ChooseDessertModule'
 
 const ComboDishForm = ({ form, baseFields, appendBase, removeBase }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, baseFields: any, appendBase: any, removeBase: any }) => {
    let checkBoxValue = false;
-   console.log('basefield', baseFields);
+   // console.log('basefield', baseFields);
    const [image, setImage] = useState<File>();
 
    useEffect(() => { form.setValue("product_img", image ? image.name : undefined) }, [image])
@@ -62,7 +64,22 @@ const ComboDishForm = ({ form, baseFields, appendBase, removeBase }: { form: Use
 
 
          </div>
-         <div className="flex flex-col gap-5 w-full md:flex-row">
+         <div className="flex flex-col gap-5 md:flex-row">
+            <FormField
+               control={form.control}
+               name="product_price"
+               render={({ field }) => (
+                  <FormItem className='w-full'>
+                     <FormLabel>Product Price</FormLabel>
+                     <FormControl>
+                        <Input type='number' min={0} placeholder="product price" {...field} />
+                     </FormControl>
+                     <FormMessage />
+                  </FormItem>
+               )}
+            />
+         </div>
+         {form.getValues("product_type") !== "dessert" && <div className="flex flex-col gap-5 w-full md:flex-row">
             <FormField
                control={form.control}
                name="base_ingredient"
@@ -121,14 +138,16 @@ const ComboDishForm = ({ form, baseFields, appendBase, removeBase }: { form: Use
                )}
             />
 
-         </div>
-
-         <div className="flex flex-col gap-5 w-full md:flex-row">
-            <div className='p-2 bg-gray-300'>drink section</div>
-         </div>
-
-
-
+         </div>}
+         {(form.getValues("product_type") == "dessert") ?
+            <div className="flex flex-col gap-5 w-full md:flex-row">
+               <ChooseDessertModule isCombo={true} form={form} />
+            </div>
+            :
+            <div className="flex flex-col gap-5 w-full md:flex-row">
+               <ChooseDrinkModule isCombo={true} form={form} />
+            </div>
+         }
       </>
    )
 }

@@ -74,6 +74,21 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
                )}
             />
          </div>
+         <div className="flex flex-col gap-5 md:flex-row">
+            <FormField
+               control={form.control}
+               name="product_price"
+               render={({ field }) => (
+                  <FormItem className='w-full'>
+                     <FormLabel>Product Price</FormLabel>
+                     <FormControl>
+                        <Input type='number' min={0} placeholder="product price" {...field} required />
+                     </FormControl>
+                     <FormMessage />
+                  </FormItem>
+               )}
+            />
+         </div>
          <div className="flex flex-col gap-10 w-full md:flex-row">
             <FormField
                control={form.control}
@@ -149,7 +164,7 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
                                           console.log("both")
                                           appendCustom({
                                              ing_name: watchedBaseIngredients[watchedBaseIngredients.length - 1].ing_name,
-                                             ing_qty: watchedBaseIngredients[watchedBaseIngredients.length - 1].ing_qty,
+                                             ing_qty: 1,
                                              ing_unit: watchedBaseIngredients[watchedBaseIngredients.length - 1].ing_unit,
                                              ing_price: 0,
                                           });
@@ -200,18 +215,22 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
                                                 <span className='text-sm font-semibold'>unit: </span>
                                                 <Input className='bg-gray-200 ' type="text" placeholder="unit" {...form.register(`custom_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} />
                                              </div>
-                                             <div className='flex items-center'>
+                                             <div className='flex items-center flex-start'>
                                                 <span className='text-sm font-semibold'>price: </span>
                                                 <Input className='bg-gray-200 ' type="number" placeholder="price" {...form.register(`custom_ingredient.${index}.ing_price`)} defaultValue={field.ing_price} />
                                              </div>
 
                                           </div>
                                           :
-                                          <div key={field.id} className="flex items-center gap-1">
-                                             <Input type="text" placeholder="name" {...form.register(`custom_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
-                                             <Input type="number" placeholder="qty" {...form.register(`custom_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/4" readOnly />
-                                             <Input type="text" placeholder="unit" {...form.register(`custom_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/4" />
-                                             <Input type="number" placeholder="price" {...form.register(`custom_ingredient.${index}.ing_price`)} defaultValue={field.ing_price} className="w-1/4" />
+                                          <div key={field.id} className="flex-col items-center gap-8">
+                                             <div className='flex items-center'>
+                                                <Input type="text" placeholder="name" {...form.register(`custom_ingredient.${index}.ing_name`)} defaultValue={field.ing_name} />
+                                             </div>
+                                             <div className="flex items-center">
+                                                <Input type="number" placeholder="qty" {...form.register(`custom_ingredient.${index}.ing_qty`)} defaultValue={field.ing_qty} className="w-1/3" readOnly />
+                                                <Input type="text" placeholder="unit" {...form.register(`custom_ingredient.${index}.ing_unit`)} defaultValue={field.ing_unit} className="w-1/3" />
+                                                <Input type="number" placeholder="price" {...form.register(`custom_ingredient.${index}.ing_price`)} defaultValue={field.ing_price} className="w-1/3" />
+                                             </div>
                                           </div>
 
                                        }

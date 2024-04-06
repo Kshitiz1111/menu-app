@@ -1,17 +1,25 @@
 import { Button } from '@/components/ui/button'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ProductFormSchema } from '@/lib/validator'
 import React, { useEffect, useState } from 'react'
-import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form'
+import { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
+import { Checkbox } from '@/components/ui/checkbox'
+import Image from "next/image"
+import ChooseDrinkModule from './ChooseDrinkModule'
+
+
+
 const DrinksForm = ({ form, isCombo, baseFields, appendBase, removeBase }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, isCombo: boolean, baseFields: any, appendBase: any, removeBase: any, }) => {
    let checkBoxValue = false;
    const [image, setImage] = useState<File>();
    useEffect(() => { form.setValue("product_img", image ? image.name : undefined) }, [image])
 
-   console.log('basefield', baseFields);
+   // console.log('basefield', baseFields);
+
+
    return (
       <>
          <div className="flex justify-between flex-col gap-5 md:flex-row">
@@ -57,7 +65,22 @@ const DrinksForm = ({ form, isCombo, baseFields, appendBase, removeBase }: { for
                )}
             />
          </div>
-         <div className="flex flex-col gap-5 w-full md:flex-row">
+         <div className="flex flex-col gap-5 md:flex-row">
+            <FormField
+               control={form.control}
+               name="product_price"
+               render={({ field }) => (
+                  <FormItem className='w-full'>
+                     <FormLabel>Product Price</FormLabel>
+                     <FormControl>
+                        <Input type='number' min={0} placeholder="product price" {...field} />
+                     </FormControl>
+                     <FormMessage />
+                  </FormItem>
+               )}
+            />
+         </div>
+         {!isCombo && <div className="flex flex-col gap-5 w-full md:flex-row">
             <FormField
                control={form.control}
                name="base_ingredient"
@@ -113,13 +136,10 @@ const DrinksForm = ({ form, isCombo, baseFields, appendBase, removeBase }: { for
                   </FormItem>
                )}
             />
-
+         </div>}
+         <div className="flex flex-col gap-5 w-full md:flex-row">
+            <ChooseDrinkModule isCombo={isCombo} form={form} />
          </div>
-         {isCombo &&
-            <div className="flex flex-col gap-5 w-full md:flex-row">
-               <div className='p-2 bg-gray-300'>combo drink section</div>
-            </div>
-         }
 
       </>
    )

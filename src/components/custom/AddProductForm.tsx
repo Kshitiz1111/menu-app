@@ -35,22 +35,23 @@ const AddProductForm = () => {
       defaultValues: {
          base_ingredient: [
             {
-               ing_name: 'Example Ingredient',
-               ing_qty: 1, // Assuming you want to allow numbers for quantity
-               ing_unit: 'g',
+               ing_name: '',
+               ing_qty: '', // Assuming you want to allow numbers for quantity
+               ing_unit: '',
                custom_marker: false, // Optional, set to false if not used
             },
             // Add more default ingredients as needed
          ],
          custom_ingredient: [
             {
-               ing_name: 'Example Ingredient',
+               ing_name: '',
                ing_qty: 1, // Assuming you want to allow numbers for quantity
-               ing_unit: 'g',
-               ing_price: 0, // Optional, set to false if not used
+               ing_unit: '',
+               ing_price: '', // Optional, set to false if not used
             },
             // Add more default ingredients as needed
          ],
+         combo_drinks: []
       },
    })
 
@@ -63,31 +64,59 @@ const AddProductForm = () => {
       name: 'custom_ingredient',
    });
 
+
    const watchedBaseIngredients = form.watch('base_ingredient');
-   console.log('watch base', watchedBaseIngredients)
+   // console.log('watch base', watchedBaseIngredients)
    const allValues = form.watch();
-   console.log('All form values', allValues);
+   // console.log('All form values', allValues);
 
    const handleChange = (categoryName: string, categoryValue: string, field: any) => {
       // console.log(categoryName, categoryValue);
       if (categoryName === "product_type") setPType(categoryValue);
       if (categoryName === "product_category") setPCategory(categoryValue);
       if (categoryName === "diet_type") setPDiet(categoryValue);
-      console.log("pType: ", pType, "pCategory: ", pCategory, "pDite: ", pDiet, field);
+      // console.log("pType: ", pType, "pCategory: ", pCategory, "pDite: ", pDiet, field);
    }
 
    // 2. Define a submit handler.
-   function onSubmit(values: z.infer<typeof ProductFormSchema>) {
+   const onSubmit = async (values: z.infer<typeof ProductFormSchema>) => {
       values.base_ingredient = values?.base_ingredient?.map(item => ({
          ...item,
          ing_qty: (typeof (item.ing_qty) === "string") ? parseFloat(item.ing_qty) : item.ing_qty,
       }));
-      console.log(values)
 
+      try {
+         let response = await fetch("/api/post_product", {
+            method: 'POST', // Specify the method
+            headers: {
+               'Content-Type': 'application/json' // Set the content type header
+            },
+            body: JSON.stringify(values) // Convert the JavaScript object to a JSON string
+         })
+         let result = await response.json();
+         (result.message === "success") ? form.reset() : "";
+      } catch (error) {
+         console.log(error)
+      }
+   }
+   const getDrinks = async () => {
+      try {
+         let response = await fetch("/api/get_drinks", {
+            method: 'GET', // Specify the method
+            headers: {
+               'Content-Type': 'application/json' // Set the content type header
+            },
+         })
+         let result = await response.json();
+         console.log(result)
+      } catch (error) {
+         console.log(error)
+      }
    }
 
    return (
       <div className='p-4'>
+         <button onClick={getDrinks}>get drinks</button>
          <div className="bg-gray-200 p-2 rounded-md">
             <h2 className="font-bold">AddProduct</h2>
             <div className="p-2">
