@@ -8,13 +8,15 @@ import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import ChooseDrinkModule from './ChooseDrinkModule'
 import ChooseDessertModule from './ChooseDessertModule'
+import Image from 'next/image'
+
 
 const ComboDishForm = ({ form, baseFields, appendBase, removeBase }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, baseFields: any, appendBase: any, removeBase: any }) => {
    let checkBoxValue = false;
    // console.log('basefield', baseFields);
    const [image, setImage] = useState<File>();
 
-   useEffect(() => { form.setValue("product_img", image ? image.name : undefined) }, [image])
+   useEffect(() => { form.setValue("product_img", image ? image.name : form.getValues("product_img") ?? undefined) }, [image])
 
 
    return (
@@ -26,6 +28,17 @@ const ComboDishForm = ({ form, baseFields, appendBase, removeBase }: { form: Use
                render={({ field }) => (
                   <FormItem className="w-full">
                      <FormLabel>Product Picture</FormLabel>
+                     {form.getValues("product_img") &&
+                        <div className="mt-4">
+                           <Image
+                              src={"/images/dish1.jpg"}
+                              alt="Selected"
+                              width={100}
+                              height={100}
+                              className='rounded-md'
+                           />
+                        </div>
+                     }
                      <FormControl>
                         <Input className="w-full" type="file" onChange={(e) => setImage(e.target.files ? e.target.files[0] : undefined)} />
                      </FormControl>

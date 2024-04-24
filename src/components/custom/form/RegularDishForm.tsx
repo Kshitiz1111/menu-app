@@ -5,6 +5,7 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ProductFormSchema } from '@/lib/validator'
+import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { UseFormReturn, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -20,7 +21,8 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
       if (watchedBaseIngredients) {
          form.setValue(`base_ingredient.${watchedBaseIngredients?.length - 1}.custom_marker`, checkBoxValue);
       }
-      form.setValue("product_img", image ? image.name : undefined)
+      console.log('sadf', form.getValues("product_img"))
+      form.setValue("product_img", image ? image.name : form.getValues("product_img") ?? undefined)
    }, [checkBoxValue, watchedBaseIngredients, image])
 
    // console.log(watchedBaseIngredients, checkBoxValue)
@@ -34,6 +36,17 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
                render={({ field }) => (
                   <FormItem className="w-full">
                      <FormLabel>Product Picture</FormLabel>
+                     {form.getValues("product_img") &&
+                        <div className="mt-4">
+                           <Image
+                              src={"/images/dish1.jpg"}
+                              alt="Selected"
+                              width={100}
+                              height={100}
+                              className='rounded-md'
+                           />
+                        </div>
+                     }
                      <FormControl>
                         <Input
                            className="w-full"

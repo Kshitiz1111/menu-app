@@ -19,17 +19,26 @@ interface BaseIngredient {
 interface Dessert {
    name: string;
    product_type: string;
-   id: string;
+   id: number;
    img_src: string;
    description: string;
    base_ingredient: BaseIngredient[];
    total_qty: number;
    price: number;
 }
-
+interface Drink {
+   name: string;
+   product_type: string;
+   id: number;
+   img_src: string;
+   description: string;
+   base_ingredient: BaseIngredient[];
+   total_qty: number;
+   price: number;
+}
 const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormReturn<z.infer<typeof ProductFormSchema>> }) => {
    const [searchResult, setSearchResult] = useState<Array<Dessert>>();
-   const [selectedDesserts, setSelectedDesserts] = useState<Array<Dessert>>();
+   const [selectedDesserts, setSelectedDesserts] = useState<Array<Dessert>>(form.getValues('combo_desserts'));
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [hasQuery, setHasQuery] = useState<boolean>(false);
 
@@ -39,7 +48,7 @@ const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFor
    useEffect(() => {
       if (selectedDesserts && selectedDesserts.length > 0) {
          // Prepare the new array for combo_drinks
-         const updatedComboDesserts = form.getValues('combo_drinks')?.map(existedItem => {
+         const updatedComboDesserts = form.getValues('combo_desserts')?.map(existedItem => {
             // Find the corresponding item in selectedDesserts
             const selectedItem = selectedDesserts.find(item => item.id === existedItem.id);
             if (selectedItem) {
@@ -60,23 +69,39 @@ const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFor
    }, [selectedDesserts]);
 
 
-   function search(query: string, queryType: string) {
+   async function search(query: string, queryType: string) {
       setOpenModal(true);
       console.log(form.getValues("product_type"))
-      const delayDebounceFn = setTimeout(() => {
-         (query) ? setHasQuery(true) : setHasQuery(false);
-         // console.log("query", query, hasQuery);
-         if (query && queryType === "input") {
-            let result = getDrinksByMatchingName(query, "dessert");
-            setSearchResult(result);
-         } else if (query && queryType === "category") {
-            let result = getDrinksByCategory(query, "dessert");
-            setSearchResult(result);
-         } else {
-            setSearchResult([]);
-         }
-         return () => clearTimeout(delayDebounceFn);
-      }, 300)
+
+      try {
+         let response = await fetch("/api/get_desserts", {
+            method: 'GET', // Specify the method
+            headers: {
+               'Content-Type': 'application/json' // Set the content type header
+            },
+         });
+         let result = await response.json();
+         console.log(result);
+
+         // Assuming result.drinks contains the array of drinks
+         // Call the utility function with the fetched drinks data
+         const delayDebounceFn = setTimeout(() => {
+            (query) ? setHasQuery(true) : setHasQuery(false);
+            // console.log("query", query, hasQuery);
+            if (query && queryType === "input") {
+               result = getDrinksByMatchingName(query, "dessert", [], result.message.desserts);
+               setSearchResult(result);
+            } else if (query && queryType === "category") {
+               result = getDrinksByCategory(query, "dessert", [], result.message.desserts);
+               setSearchResult(result);
+            } else {
+               setSearchResult([]);
+            }
+            return () => clearTimeout(delayDebounceFn);
+         }, 300)
+      } catch (error) {
+         console.log(error);
+      }
       // console.log("query", query, "search result", searchResult);
    }
    // console.log("selectedDesserts", selectedDesserts)
@@ -105,7 +130,7 @@ const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFor
                   {openModal && (searchResult && searchResult?.length > 0)
                      ?
                      <div className='p-2 m-2 rounded-md shadow-md bg-gray-200'>
-                        <span onClick={() => closeModal()}>X</span>
+                        <span onClick={() => closeModal()} className='cursor-pointer p-1 font-bold'>X</span>
                         <div id='search result' className=''>
                            <div className='flex flex-wrap gap-2 p-2 '>
                               {searchResult?.map((dessert) =>
@@ -130,7 +155,7 @@ const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFor
                            : ""
                         : ""
                   }
-                  {(searchResult && searchResult?.length > 0)
+                  {(selectedDesserts && selectedDesserts?.length > 0)
                      &&
                      <div id='selected-desserts' className="">
 

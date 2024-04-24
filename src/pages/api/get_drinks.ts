@@ -9,6 +9,7 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse){
       }
       if(req.method === 'GET'){
          const result = await getAllDrinks()
+         
          res.json({ message: result });
       }
 

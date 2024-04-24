@@ -15,7 +15,7 @@ import ChooseDrinkModule from './ChooseDrinkModule'
 const DrinksForm = ({ form, isCombo, baseFields, appendBase, removeBase }: { form: UseFormReturn<z.infer<typeof ProductFormSchema>>, isCombo: boolean, baseFields: any, appendBase: any, removeBase: any, }) => {
    let checkBoxValue = false;
    const [image, setImage] = useState<File>();
-   useEffect(() => { form.setValue("product_img", image ? image.name : undefined) }, [image])
+   useEffect(() => { form.setValue("product_img", image ? image.name : form.getValues("product_img") ?? undefined) }, [image])
 
    // console.log('basefield', baseFields);
 
@@ -29,6 +29,17 @@ const DrinksForm = ({ form, isCombo, baseFields, appendBase, removeBase }: { for
                render={({ field }) => (
                   <FormItem className="w-full">
                      <FormLabel>Product Picture</FormLabel>
+                     {form.getValues("product_img") &&
+                        <div className="mt-4">
+                           <Image
+                              src={"/images/dish1.jpg"}
+                              alt="Selected"
+                              width={100}
+                              height={100}
+                              className='rounded-md'
+                           />
+                        </div>
+                     }
                      <FormControl>
                         <Input className="w-full" type="file" onChange={(e) => setImage(e.target.files ? e.target.files[0] : undefined)} />
                      </FormControl>

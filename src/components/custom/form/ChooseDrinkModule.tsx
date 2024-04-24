@@ -20,17 +20,17 @@ interface BaseIngredient {
 interface Drink {
    name: string;
    product_type: string;
-   id: string;
+   id: number | string;
    img_src: string;
    description: string;
-   base_ingredient: BaseIngredient[];
+   base_ingredient: BaseIngredient[] | undefined;
    total_qty: number;
    price: number;
 }
 interface Dessert {
    name: string;
    product_type: string;
-   id: string;
+   id: number;
    img_src: string;
    description: string;
    base_ingredient: BaseIngredient[];
@@ -39,8 +39,8 @@ interface Dessert {
 }
 
 const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormReturn<z.infer<typeof ProductFormSchema>> }) => {
-   const [searchResult, setSearchResult] = useState<Array<Drink | Dessert>>();
-   const [selectedDrinks, setSelectedDrinks] = useState<Array<Drink | Dessert>>();
+   const [searchResult, setSearchResult] = useState<Array<Drink>>();
+   const [selectedDrinks, setSelectedDrinks] = useState<Array<Drink>>(form.getValues('combo_drinks'));
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [hasQuery, setHasQuery] = useState<boolean>(false);
 
@@ -71,26 +71,45 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
    }, [selectedDrinks]);
 
 
-   function search(query: string, queryType: string) {
+   async function search(query: string, queryType: string) {
       setOpenModal(true);
       console.log(form.getValues("product_type"))
-      const delayDebounceFn = setTimeout(() => {
-         (query) ? setHasQuery(true) : setHasQuery(false);
-         // console.log("query", query, hasQuery);
-         if (query && queryType === "input") {
-            let result = getDrinksByMatchingName(query, "drinks");
-            setSearchResult(result);
-         } else if (query && queryType === "category") {
-            let result = getDrinksByCategory(query, "drinks");
-            setSearchResult(result);
-         } else {
-            setSearchResult([]);
-         }
-         return () => clearTimeout(delayDebounceFn);
-      }, 300)
+
+      try {
+         let response = await fetch("/api/get_drinks", {
+            method: 'GET', // Specify the method
+            headers: {
+               'Content-Type': 'application/json' // Set the content type header
+            },
+         });
+         let result = await response.json();
+         // console.log(result);
+
+         // Assuming result.drinks contains the array of drinks
+         // Call the utility function with the fetched drinks data
+         const delayDebounceFn = setTimeout(() => {
+            (query) ? setHasQuery(true) : setHasQuery(false);
+            // console.log("query", query, hasQuery);
+            if (query && queryType === "input") {
+               let matchItem = getDrinksByMatchingName(query, "drinks", result.message.drinks, []);
+               console.log(matchItem)
+               setSearchResult(matchItem);
+            } else if (query && queryType === "category") {
+               let matchItem = getDrinksByCategory(query, "drinks", result.message.drinks, []);
+               setSearchResult(matchItem);
+            } else {
+               setSearchResult([]);
+            }
+            return () => clearTimeout(delayDebounceFn);
+         }, 300)
+      } catch (error) {
+         console.log(error);
+      }
+
+
       // console.log("query", query, "search result", searchResult);
    }
-   // console.log("selectedDrinks", selectedDrinks)
+   console.log("selectedDrinks", selectedDrinks)
    return (
       <div>
          {isCombo &&
@@ -116,7 +135,7 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
                   {openModal && (searchResult && searchResult?.length > 0)
                      ?
                      <div className='p-2 m-2 rounded-md shadow-md bg-gray-200'>
-                        <span onClick={() => closeModal()}>X</span>
+                        <span onClick={() => closeModal()} className='cursor-pointer p-1 font-bold'>X</span>
                         <div id='search result' className=''>
                            <div className='flex flex-wrap gap-2 p-2 '>
                               {searchResult?.map((drink) =>
@@ -141,7 +160,7 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
                            : ""
                         : ""
                   }
-                  {(searchResult && searchResult?.length > 0)
+                  {(selectedDrinks && selectedDrinks?.length > 0)
                      &&
                      <div id='selected-drinks' className="">
 

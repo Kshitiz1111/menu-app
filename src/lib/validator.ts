@@ -3,6 +3,7 @@ import { object, z } from "zod"
 
 
 export const ProductFormSchema = z.object({
+   product_id:z.optional(z.number().or(z.string())),
    product_category: z.string(),
    product_price: z.number().min(1,{message:"enter valid price"}).or(z.string().min(1,{message:"price field empty"})),
    product_type: z.string(),
@@ -21,6 +22,7 @@ export const ProductFormSchema = z.object({
    base_ingredient: z.optional(
       z.array(
          z.object({
+            ing_id:z.optional(z.string().or(z.number())),
             ing_name:z.string(),
             ing_qty:z.number().or(z.string()), 
             ing_unit:z.string(),
@@ -31,6 +33,7 @@ export const ProductFormSchema = z.object({
    custom_ingredient: z.optional(
       z.array(
          z.object({
+            ing_id:z.optional(z.string().or(z.number())),
             ing_name:z.string(),
             ing_qty:z.number().or(z.string()), 
             ing_unit:z.string(),
@@ -43,21 +46,23 @@ export const ProductFormSchema = z.object({
          z.object({
             name: z.string(),
             product_type: z.string(),
-            id: z.string(),
+            id: z.number().or(z.string()),
+            combo_drinks_id:z.optional(z.number()),
             img_src: z.string(),
             description: z.string(),
             base_ingredient: z.optional(
                z.array(
                   z.object({
+                    ing_id:z.optional(z.string().or(z.number())),
                     ing_name: z.string(),
                     ing_qty: z.number().or(z.string()),
                     ing_unit: z.string(),
-                    custom_marker: z.boolean().optional(),
+                    custom_marker: z.boolean().optional().or(z.string()),
                   })
                 )
             ),
             total_qty: z.number(),
-            price: z.number(),
+            price: z.number().or(z.string()),
          })
       )
    ),
@@ -66,21 +71,23 @@ export const ProductFormSchema = z.object({
          z.object({
             name: z.string(),
             product_type: z.string(),
-            id: z.string(),
+            id: z.number().or(z.string()),
+            combo_dessert_id:z.optional(z.number()),
             img_src: z.string(),
             description: z.string(),
             base_ingredient: z.optional(
                z.array(
                   z.object({
+                    ing_id:z.optional(z.string().or(z.number())),
                     ing_name: z.string(),
                     ing_qty: z.number().or(z.string()),
                     ing_unit: z.string(),
-                    custom_marker: z.boolean().optional(),
+                    custom_marker: z.boolean().optional().or(z.string()),
                   })
                 )
             ),
             total_qty: z.number(),
-            price: z.number(),
+            price: z.number().or(z.string()),
          })
       )
    )

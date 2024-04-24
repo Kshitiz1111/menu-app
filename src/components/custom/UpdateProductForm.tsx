@@ -22,37 +22,21 @@ import { useState } from "react"
 import RegularDishForm from './form/RegularDishForm'
 import ComboDishForm from './form/ComboDishForm'
 import DrinksForm from './form/DrinksForm'
+import { useEditProductContext } from '@/context/editProductContext'
 
-const AddProductForm = () => {
-   const [pType, setPType] = useState<string | undefined>();
-   const [pCategory, setPCategory] = useState<string | undefined>();
-   const [pDiet, setPDiet] = useState<string | undefined>();
-   //set which formSchema is active
+const UpdateProductForm = () => {
 
+   const context = useEditProductContext();
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+   const { toBeEditedProduct } = context;
+   console.log(toBeEditedProduct)
    // 1. Define your form.
    const form = useForm<z.infer<typeof ProductFormSchema>>({
       resolver: zodResolver(ProductFormSchema),
-      defaultValues: {
-         base_ingredient: [
-            {
-               ing_name: '',
-               ing_qty: '', // Assuming you want to allow numbers for quantity
-               ing_unit: '',
-               custom_marker: false, // Optional, set to false if not used
-            },
-            // Add more default ingredients as needed
-         ],
-         custom_ingredient: [
-            {
-               ing_name: '',
-               ing_qty: 1, // Assuming you want to allow numbers for quantity
-               ing_unit: '',
-               ing_price: '', // Optional, set to false if not used
-            },
-            // Add more default ingredients as needed
-         ],
-         combo_drinks: []
-      },
+      defaultValues: JSON.parse(toBeEditedProduct.product)
    })
 
    const { fields: baseFields, append: appendBase, remove: removeBase } = useFieldArray({
@@ -70,17 +54,17 @@ const AddProductForm = () => {
    const allValues = form.watch();
    // console.log('All form values', allValues);
 
-   const handleChange = (categoryName: string, categoryValue: string, field: any) => {
-      // console.log(categoryName, categoryValue);
-      if (categoryName === "product_type") setPType(categoryValue);
-      if (categoryName === "product_category") setPCategory(categoryValue);
-      if (categoryName === "diet_type") setPDiet(categoryValue);
-      // console.log("pType: ", pType, "pCategory: ", pCategory, "pDite: ", pDiet, field);
-   }
+   // const handleChange = (categoryName: string, categoryValue: string, field: any) => {
+   //    // console.log(categoryName, categoryValue);
+   //    if (categoryName === "product_type") setPType(categoryValue);
+   //    if (categoryName === "product_category") setPCategory(categoryValue);
+   //    if (categoryName === "diet_type") setPDiet(categoryValue);
+   //    // console.log("pType: ", pType, "pCategory: ", pCategory, "pDite: ", pDiet, field);
+   // }
 
    // 2. Define a submit handler.
    const onSubmit = async (values: z.infer<typeof ProductFormSchema>) => {
-      console.log("hello")
+      console.log("product for update", values, JSON.parse(toBeEditedProduct.productRawData))
       values.base_ingredient = values?.base_ingredient?.map(item => ({
          ...item,
          ing_qty: (typeof (item.ing_qty) === "string") ? parseFloat(item.ing_qty) : item.ing_qty,
@@ -88,7 +72,7 @@ const AddProductForm = () => {
 
       try {
          let response = await fetch("/api/product", {
-            method: 'POST', // Specify the method
+            method: 'PUT', // Specify the method
             headers: {
                'Content-Type': 'application/json' // Set the content type header
             },
@@ -100,7 +84,7 @@ const AddProductForm = () => {
          console.log(error)
       }
    }
-   console.log(form.getValues());
+   // console.log("tobeupdate", form.getValues());
 
    return (
       <div className='p-4'>
@@ -121,11 +105,7 @@ const AddProductForm = () => {
                                  <FormControl>
                                     <RadioGroup
                                        className="flex"
-                                       onValueChange={(value) => {
-                                          field.value = value;
-                                          form.setValue("product_type", value);
-                                          handleChange(field.name, field.value, field)
-                                       }}
+                                       {...field}
 
                                     >
                                        <div className="flex items-center space-x-2">
@@ -159,11 +139,7 @@ const AddProductForm = () => {
                                  <FormControl>
                                     <RadioGroup
                                        className="flex"
-                                       onValueChange={(value) => {
-                                          field.value = value;
-                                          form.setValue("product_category", value);
-                                          handleChange(field.name, field.value, field)
-                                       }}
+                                       {...field}
                                     >
                                        <FormItem className="flex items-center space-x-2">
                                           <FormControl>
@@ -198,11 +174,7 @@ const AddProductForm = () => {
                                  <FormControl>
                                     <RadioGroup
                                        className="flex"
-                                       onValueChange={(value) => {
-                                          field.value = value;
-                                          form.setValue("diet_type", value);
-                                          handleChange(field.name, field.value, field)
-                                       }}
+                                       {...field}
                                     >
                                        <div className="flex items-center space-x-2">
                                           <RadioGroupItem value="veg" id="veg" />
@@ -226,10 +198,10 @@ const AddProductForm = () => {
                      </div>
                      {
                         ((
-                           pType === "starter"
-                           || pType === "main"
-                           || pType === "dessert"
-                        ) && pCategory === "combo")
+                           form.getValues("product_type") === "starter"
+                           || form.getValues("product_type") === "main"
+                           || form.getValues("product_type") === "dessert"
+                        ) && form.getValues("product_category") === "combo")
                            ? <ComboDishForm
                               form={form}
                               baseFields={baseFields}
@@ -238,11 +210,11 @@ const AddProductForm = () => {
                            />
                            :
                            ((
-                              pType === "starter"
-                              || pType === "main"
-                              || pType === "dessert"
-                           ) && (pCategory === "regular" || pCategory === "special"))
-                              ? (pType === "dessert")
+                              form.getValues("product_type") === "starter"
+                              || form.getValues("product_type") === "main"
+                              || form.getValues("product_type") === "dessert"
+                           ) && (form.getValues("product_category") === "regular" || form.getValues("product_category") === "special"))
+                              ? (form.getValues("product_type") === "dessert")
                                  ? <RegularDishForm
                                     form={form}
                                     hideCustom={true}
@@ -265,8 +237,8 @@ const AddProductForm = () => {
                                  />
                               :
                               (
-                                 pType === "drinks"
-                                 && (pCategory === "regular" || pCategory === "special")
+                                 form.getValues("product_type") === "drinks"
+                                 && (form.getValues("product_category") === "regular" || form.getValues("product_category") === "special")
                               )
                                  ? <DrinksForm
                                     form={form}
@@ -277,8 +249,8 @@ const AddProductForm = () => {
                                  />
                                  :
                                  (
-                                    pType === "drinks"
-                                    && pCategory === "combo"
+                                    form.getValues("product_type") === "drinks"
+                                    && form.getValues("product_category") === "combo"
                                  ) ? <DrinksForm
                                     form={form}
                                     isCombo={true}
@@ -290,7 +262,7 @@ const AddProductForm = () => {
 
                      }
 
-                     <Button type="submit" disabled={!form.formState.isValid}>Submit</Button>
+                     <Button type="submit" disabled={!form.formState.isValid}>Update</Button>
                   </form>
                </Form>
             </div>
@@ -299,4 +271,4 @@ const AddProductForm = () => {
    )
 }
 
-export default AddProductForm
+export default UpdateProductForm
