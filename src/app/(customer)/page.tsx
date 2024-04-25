@@ -1,8 +1,11 @@
-import React from 'react'
+import DishCard from "@/components/custom/DishCard"
 
 const CustomerPage = () => {
+
    return (
-      <div>CustomerPage</div>
+      <div className="p-2">
+         <DishCard />
+      </div>
    )
 }
 
