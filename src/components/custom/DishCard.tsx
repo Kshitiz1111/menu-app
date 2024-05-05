@@ -19,8 +19,13 @@ import {
    DialogTitle,
    DialogTrigger,
 } from "@/components/ui/dialog"
-
-import { useSingleDishContext } from "@/context/singleDishContext"
+import {
+   Tooltip,
+   TooltipContent,
+   TooltipProvider,
+   TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { useOrderContext } from "@/context/orderContext"
 import { getSingleProduct } from "@/lib/actions/product.action"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -29,6 +34,7 @@ import { ProductFormSchema } from "@/lib/validator"
 import { z } from "zod"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
+import type { orderContextType } from "@/context/orderContext"
 
 interface Product {
    baseing_ids: number[] | null;
@@ -49,7 +55,8 @@ interface Product {
 const DishCard = () => {
    const [products, setProducts] = useState<Array<Product>>();
    const [singleProduct, setSingleProduct] = useState<z.infer<typeof ProductFormSchema>>()
-   const [openNote, setOpenNote] = useState(false);
+   const [openNote, setOpenNote] = useState<Boolean>(false);
+   const loggedInUser = "guest";
 
    async function getProducts() {
       try {
@@ -70,23 +77,54 @@ const DishCard = () => {
       getProducts()
    }, [])
 
-   // const context = useSingleDishContext()
-   // if (!context) {
-   //    // Return null or some fallback UI
-   //    return null;
-   // }
-   // const { setSingleDish, product } = context;
+   const context = useOrderContext()
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+   const { setOrders, orders } = context as orderContextType;
 
    const handleSelect = async (dish: any) => {
       try {
          let result = await getSingleProduct(dish);
-         setSingleProduct(result.product)
+         // setSingleProduct(result.product)
+         setSingleProduct({
+            ...result.product,
+            total_quantity: 1,
+            total_price: 1 * Number(result.product.product_price),
+         });
          // setSingleDish(JSON.stringify(result.product));
          // console.log('customer context product', JSON.parse(product))
       } catch (error) {
          console.log(error)
       }
    }
+
+   useEffect(() => {
+      // Serialize the orders array to a JSON string
+      function generateGuestId() {
+         return '_' + Math.random().toString(36).substr(2, 9);
+      }
+
+      // Check if a guest ID already exists
+      let guestId = localStorage.getItem('guestId');
+      if (!guestId) {
+         guestId = generateGuestId();
+         localStorage.setItem('guestId', guestId);
+      }
+
+      const ordersWithUserId: any = {
+         orders: [...orders],
+         userId: guestId, // Use the guest ID for guests
+      };
+
+      const ordersString = JSON.stringify(ordersWithUserId);
+      localStorage.setItem('orders', ordersString);
+
+      console.log("totalOrder", ordersWithUserId,);
+
+   }, [orders])
+
    return (
       <div className="flex flex-wrap gap-1">
          {(products && products.length > 0) ?
@@ -107,7 +145,7 @@ const DishCard = () => {
                            </Button>
                         </DialogTrigger>
                         {singleProduct &&
-                           <DialogContent className={`${(product.customing_ids.length > 2) ? 'overflow-y-scroll h-screen ' : 'overflow-hidden h-auto'} md:h-auto`}>
+                           <DialogContent className={`${(product.customing_ids.length > 2) ? 'overflow-y-scroll h-screen' : 'overflow-hidden h-auto'} md:h-auto`}>
                               <DialogHeader>
                                  <DialogTitle>{singleProduct.product_name}</DialogTitle>
                                  <Image src={'/images/dish1.jpg'} className={"rounded-md mx-auto block md:mx-0"} alt="dish image" width={50} height={50}></Image>
@@ -250,9 +288,65 @@ const DishCard = () => {
                               <Separator />
 
                               <div>
-                                 combo section
+                                 <h1 className="text-lg">combo dish <span className="text-sm">( recommended )</span></h1>
+                                 <div className="flex flex-wrap gap-1 pt-2">
+
+                                    <div className=" w-40 border rounded-md border-black p-1 text-sm">
+                                       <div className="flex flex-wrap justify-between">
+                                          <span className="font-semibold">name</span>
+                                          <span>34</span>
+                                          {/* <Image src={'/images/dish1.jpg'} className={"rounded-md mx-auto block md:mx-0"} alt="dish image" width={50} height={50}></Image> */}
+                                       </div>
+                                       <p className="text-gray-500">description</p>
+                                       <span className="text-gray-500"><span className="font-semibold">by: </span> restaurant</span>
+                                    </div>
+
+                                 </div>
+                              </div>
+
+                              <div className="bg-white border-t border-black sticky -bottom-10 flex flex-wrap justify-between items-center p-2 -mx-6 -mb-6">
+                                 <span className="font-semibold">price: <span>{singleProduct.total_price ?? singleProduct.product_price}</span>$</span>
+                                 <div className="flex gap-3 items-center">
+                                    <div className="flex items-center gap-2">
+                                       <span>quantity: </span>
+                                       <TooltipProvider delayDuration={800} skipDelayDuration={500}>
+                                          <Tooltip>
+                                             <TooltipTrigger asChild>
+                                                <Input type="number" placeholder="qty" className="w-14" minLength={1}
+                                                   value={singleProduct.total_quantity ?? 1}
+                                                   onChange={(e) => {
+                                                      const newQuantity = Math.trunc(Number(e.target.value));
+                                                      setSingleProduct({
+                                                         ...singleProduct,
+                                                         total_quantity: (newQuantity < 1) ? "" : newQuantity,
+                                                         total_price: (newQuantity < 1) ? singleProduct.product_price : newQuantity * Number(singleProduct.product_price),
+                                                      });
+                                                      console.log("temp", singleProduct);
+                                                   }}
+                                                ></Input>
+                                             </TooltipTrigger>
+                                             {
+                                                (singleProduct.total_quantity == "") ? <TooltipContent className="bg-red-500 text-white" forceMount={(singleProduct.total_quantity == "") ? true : false} >
+                                                   <p>enter quantity</p>
+                                                </TooltipContent>
+                                                   : false
+                                             }
+
+                                          </Tooltip>
+                                       </TooltipProvider>
+
+                                    </div>
+                                    <Separator orientation="vertical" />
+                                    <Button
+                                       variant="outline"
+                                       disabled={(singleProduct.total_quantity == "") ? true : false}
+                                       className="bg-black text-white"
+                                       onClick={() => setOrders([...orders, singleProduct])}
+                                    >add to cart</Button>
+                                 </div>
                               </div>
                            </DialogContent>
+
 
                         }
 

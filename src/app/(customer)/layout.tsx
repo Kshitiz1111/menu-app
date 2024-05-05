@@ -1,17 +1,15 @@
 import CustomerNav from "@/components/custom/CustomerNav";
 import '../globals.css'
-import { SingleDishWrapper } from "@/context/singleDishContext";
+import { OrderWrapper } from "@/context/orderContext";
 
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
    return (
       <html>
          <body>
-            <CustomerNav />
-            <SingleDishWrapper>
+            <OrderWrapper>
+               <CustomerNav />
                {children}
-            </SingleDishWrapper>
-
-
+            </OrderWrapper>
          </body>
       </html>
 

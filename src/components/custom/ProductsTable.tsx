@@ -4,6 +4,18 @@ import { getSingleProduct } from "@/lib/actions/product.action";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+   AlertDialog,
+   AlertDialogAction,
+   AlertDialogCancel,
+   AlertDialogContent,
+   AlertDialogDescription,
+   AlertDialogFooter,
+   AlertDialogHeader,
+   AlertDialogTitle,
+   AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 interface Product {
    baseing_ids: number[] | null;
@@ -113,7 +125,24 @@ const ProductTable = () => {
                         <td className="border p-1">{product.product_des.substring(0, 20)}...</td>
                         <td className="border p-1 flex justify-evenly">
                            <Link href={`/admin/updateproduct/${product.product_id}`} ><button onClick={() => handleEdit(product)} className="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded mr-2">Edit</button></Link>
-                           <button onClick={() => handleDelete(product.product_id)} className="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Delete</button>
+                           <AlertDialog>
+                              <AlertDialogTrigger className="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Delete</AlertDialogTrigger>
+                              <AlertDialogContent>
+                                 <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure you?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                       This will permanently delete <strong>{product.product_name}</strong>.
+                                    </AlertDialogDescription>
+                                 </AlertDialogHeader>
+                                 <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(product.product_id)}
+                                       className="bg-red-500"
+                                    >Continue</AlertDialogAction>
+                                 </AlertDialogFooter>
+                              </AlertDialogContent>
+                           </AlertDialog>
+
                         </td>
                      </tr>
                   ))}

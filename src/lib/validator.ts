@@ -19,6 +19,11 @@ export const ProductFormSchema = z.object({
    }).max(100,{
       message: "Product description must be less than 100 characters."
    }),
+   customer_note: z.optional(z.string()),
+   total_quantity: z.optional(z.string().or(z.number())),
+   total_price: z.optional(z.string().or(z.number())),
+   purchase_order_id:z.optional(z.string()),
+   purchase_confirm:z.optional(z.boolean()),
    base_ingredient: z.optional(
       z.array(
          z.object({
@@ -94,3 +99,35 @@ export const ProductFormSchema = z.object({
 
 })
 
+
+interface CustomerInfo {
+   name: string;
+   email: string;
+   phone: string;
+  }
+  
+  interface AmountBreakdown {
+   label: string;
+   amount: number;
+  }
+  
+  interface ProductDetails {
+   identity: string;
+   name: string;
+   total_price: number;
+   quantity: number;
+   unit_price: number;
+  }
+  
+  export interface PaymentPayload {
+   return_url: string;
+   website_url: string;
+   amount: number;
+   purchase_order_id: string;
+   purchase_order_name: string;
+   customer_info: CustomerInfo;
+   amount_breakdown: AmountBreakdown[];
+   product_details: ProductDetails[];
+   merchant_username: string;
+   merchant_extra: string;
+  }
