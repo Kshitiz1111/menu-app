@@ -130,6 +130,7 @@ const OrderBtn = () => {
          <div className="mt-4">
             <Button variant={'secondary'}
                className="w-full bg-black hover:bg-gray-800 text-white "
+               disabled={(totalPrice > 10) ? false : true}
                onClick={handlePayment}
             >
                Place Order

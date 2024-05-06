@@ -5,7 +5,7 @@ export const khaltiPay = async(payload:PaymentPayload)=>{
       let response = await fetch("https://a.khalti.com/api/v2/epayment/initiate/", {
          method: "POST",
          headers: {
-            "Authorization": `key ${process.env.KHALTI_LIVE_SECRET_KEY}`,
+            "Authorization": `key faec6057a16449a6ae2866e07b2935f6`,
             "Content-Type": "application/json"
          },
          body: JSON.stringify(payload)
@@ -24,7 +24,7 @@ export const paymentVerificationLookup = async(paymentId:string)=>{
       let response = await fetch("https://a.khalti.com/api/v2/epayment/lookup/", {
          method: "POST",
          headers: {
-            "Authorization": `key ${process.env.KHALTI_LIVE_SECRET_KEY}`,
+            "Authorization": `key faec6057a16449a6ae2866e07b2935f6`,
             "Content-Type": "application/json"
          },
          body: JSON.stringify({pidx: paymentId})
