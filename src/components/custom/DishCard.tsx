@@ -346,11 +346,7 @@ const DishCard = () => {
                                  </div>
                               </div>
                            </DialogContent>
-
-
                         }
-
-
                      </Card>
                   </Dialog>
 
