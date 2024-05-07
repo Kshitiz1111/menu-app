@@ -4,6 +4,7 @@ import { useOrderContext } from '@/context/orderContext'
 import type { orderContextType } from "@/context/orderContext"
 import { PaymentPayload } from '@/lib/validator'
 import { khaltiPay } from '@/lib/actions/payment.action'
+import { validateAndSanitizeUrl } from '@/lib/utils'
 
 
 const OrderBtn = () => {
@@ -89,28 +90,32 @@ const OrderBtn = () => {
 
          const data = await response.json();
          if (response.ok) {
-            console.log("khalti initial payment success: ", data);
-            let guestId = localStorage.getItem('guestId');
+            // Parse the URL
+            let sanitizedUrl = validateAndSanitizeUrl(data.payment_url);
+            if (sanitizedUrl) {
+               console.log("khalti initial payment success: ", data);
+               let guestId = localStorage.getItem('guestId');
 
-            setOrders(orders.map((item) => {
-               // Check if item.purchase_confirm is false or undefined
-               if (item.purchase_confirm === false || item.purchase_confirm === undefined) {
-                  // If the condition is met, return a new object with the modified purchase_order_id
-                  return { ...item, purchase_order_id: guestId + "_" + tempOrderId };
-               } else {
-                  // If the condition is not met, return the item as is
-                  return item;
-               }
-            }));
-            // Check if a guest ID already exists
-            const ordersWithUserId: any = {
-               orders: [...orders],
-               userId: guestId, // Use the guest ID for guests
-            };
-            const ordersString = JSON.stringify(ordersWithUserId);
-            localStorage.setItem('orders', ordersString);
+               setOrders(orders.map((item) => {
+                  // Check if item.purchase_confirm is false or undefined
+                  if (item.purchase_confirm === false || item.purchase_confirm === undefined) {
+                     // If the condition is met, return a new object with the modified purchase_order_id
+                     return { ...item, purchase_order_id: guestId + "_" + tempOrderId };
+                  } else {
+                     // If the condition is not met, return the item as is
+                     return item;
+                  }
+               }));
+               // Check if a guest ID already exists
+               const ordersWithUserId: any = {
+                  orders: [...orders],
+                  userId: guestId, // Use the guest ID for guests
+               };
+               const ordersString = JSON.stringify(ordersWithUserId);
+               localStorage.setItem('orders', ordersString);
 
-            window.location.href = data.payment_url;
+               window.location.href = data.payment_url;
+            }
          }
 
       } catch (error) {
