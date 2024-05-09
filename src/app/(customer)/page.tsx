@@ -7,6 +7,7 @@ import { useOrderContext } from '@/context/orderContext'
 import type { orderContextType } from "@/context/orderContext"
 import { useEffect, useState } from "react"
 import { paymentVerificationLookup } from "@/lib/actions/payment.action"
+import { OrderType } from "@/types/orders"
 
 interface TransactionDetails {
    pidx: string;
@@ -99,7 +100,10 @@ const CustomerPage = () => {
       //change purchase_confirm in order items
       const updatedOrders = orders.map((order, index) => {
          const isConditionMet = transactionDetails.purchase_order_id === order.purchase_order_id && transactionDetails.status === "Completed";
+         //store confirm order in database
+         if (isConditionMet) {
 
+         }
          // Return a new object that includes all properties of the original order and a new boolean property
          console.log(order.purchase_confirm, isConditionMet)
          return {
@@ -119,6 +123,56 @@ const CustomerPage = () => {
                      await verifyPayment();
                   })();
                }
+               //store completed order in database
+               if (transactionDetails.status === "Completed") {
+                  let currentOrderItem = orders.filter((order) => order.purchase_order_id === transactionDetails.purchase_order_id);
+
+                  let filteredOrderItems = currentOrderItem.map((order) => {
+                     return (
+                        {
+                           product_id: Number(order.product_id),
+                           total_quantity: Number(order.total_quantity),
+                           total_price: Number(order.total_price),
+                           customer_note: order.customer_note,
+                           customized_ingredients: (order.custom_ingredient && order.custom_ingredient?.length > 0) ? order.custom_ingredient.filter((ing) => Number(ing.ing_qty) > 0) : null,
+                        }
+                     )
+                  });
+                  console.log("filteredOrderItems", filteredOrderItems);
+                  let payload: OrderType = {
+                     purchase_order_id: transactionDetails.purchase_order_id,
+                     no_of_item: filteredOrderItems.length,
+                     total_price: transactionDetails.total_amount / 100,
+                     compensation: null,
+                     status: "paid",
+                     details: filteredOrderItems,
+                  };
+                  (async () => {
+                     try {
+                        // Create the fetch request
+                        const response = await fetch('http://localhost:3000/api/orders', {
+                           method: 'POST', // Specify the method
+                           headers: {
+                              'Content-Type': 'application/json', // Set the content type header
+                           },
+                           body: JSON.stringify(payload), // Convert the payload to a JSON string
+                        });
+
+                        // Check if the request was successful
+                        if (!response.ok) {
+                           throw new Error('Network response was not ok');
+                        }
+
+                        // Parse the response
+                        const data = await response.json();
+
+                        console.log('Success:', data);
+                     } catch (error) {
+                        console.error('Error:', error);
+                     }
+                  })()
+               }
+
                // Now, you can use setOrders to update your state with the new array
                setOrders(updatedOrders);
                let guestId = localStorage.getItem('guestId');
