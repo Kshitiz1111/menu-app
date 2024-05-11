@@ -139,21 +139,45 @@ const OrderedItem = () => {
                                                          <Separator orientation="horizontal" />
                                                          <div className="pb-1">
                                                             <span className="font-semibold">combo drinks</span>
-                                                            <ul className="px-1">
-                                                               {
-                                                                  item.combo_drinks.map((drink, i) => (
-                                                                     <div className="flex">
-                                                                        <span className="font-semibold">{++i}. </span>
-                                                                        <li className="mr-1 mb-1">
-                                                                           <span className="mr-1">name: {drink.name},</span>
-                                                                           <span className="mr-1">qty: {drink.total_qty}</span>
-                                                                           <span className="mr-1">total price: ${Number(drink.price) * Number(drink.total_qty)}</span>
-                                                                        </li>
-                                                                     </div>
-                                                                  ))
-                                                               }
-
-                                                            </ul>
+                                                            <Accordion type="single" collapsible>
+                                                               <ul className="px-1">
+                                                                  <AccordionItem value="item-1" className="border-0">
+                                                                     <AccordionTrigger className='py-0 text-xs justify-normal'>
+                                                                        {
+                                                                           item.combo_drinks.map((drink, i) => (
+                                                                              <div className="flex">
+                                                                                 <li className="mr-1 mb-1">
+                                                                                    <span className="mr-1 bg-gray-400 rounded-full px-1">{drink.total_qty}</span>
+                                                                                    <span className="mr-1">{drink.name} </span>
+                                                                                 </li>
+                                                                              </div>
+                                                                           ))
+                                                                        }
+                                                                     </AccordionTrigger>
+                                                                     <AccordionContent className="pb-0">
+                                                                        {
+                                                                           item.combo_drinks.map((drink, i) => (
+                                                                              <div className="flex text-xs">
+                                                                                 <span className="font-semibold">{++i}. </span>
+                                                                                 <li className="mr-1 mb-1">
+                                                                                    <span className="mr-1">name: {drink.name},</span>
+                                                                                    <span className="mr-1">qty: {drink.total_qty}, </span>
+                                                                                    <span className="mr-1">total price: ${Number(drink.price) * Number(drink.total_qty)}, </span>
+                                                                                    <span>ingredients:
+                                                                                       {(drink.base_ingredient && drink.base_ingredient.length > 0) &&
+                                                                                          drink.base_ingredient.map((ing) => (
+                                                                                             <span> {ing.ing_name}, </span>
+                                                                                          ))
+                                                                                       }
+                                                                                    </span>
+                                                                                 </li>
+                                                                              </div>
+                                                                           ))
+                                                                        }
+                                                                     </AccordionContent>
+                                                                  </AccordionItem>
+                                                               </ul>
+                                                            </Accordion>
                                                          </div>
                                                       </>
                                                       : ""
@@ -165,21 +189,45 @@ const OrderedItem = () => {
                                                          <Separator orientation="horizontal" />
                                                          <div className="pb-1">
                                                             <span className="font-semibold">combo dessert</span>
-                                                            <ul className="px-1">
-                                                               {
-                                                                  item.combo_desserts.map((dessert, i) => (
-                                                                     <div className="flex">
-                                                                        <span className="font-semibold">{++i}. </span>
-                                                                        <li className="mr-1 mb-1">
-                                                                           <span className="mr-1">name: {dessert.name},</span>
-                                                                           <span className="mr-1">quantity: {dessert.total_qty}</span>
-                                                                           <span className="mr-1">total price: ${Number(dessert.price) * Number(dessert.total_qty)}</span>
-                                                                        </li>
-                                                                     </div>
-                                                                  ))
-                                                               }
-
-                                                            </ul>
+                                                            <Accordion type="single" collapsible>
+                                                               <ul className="px-1">
+                                                                  <AccordionItem value="item-1" className="border-0">
+                                                                     <AccordionTrigger className='py-0 text-xs justify-normal'>
+                                                                        {
+                                                                           item.combo_desserts.map((dessert, i) => (
+                                                                              <div className="flex">
+                                                                                 <li className="mr-1 mb-1">
+                                                                                    <span className="mr-1 bg-gray-400 rounded-full px-1">{dessert.total_qty}</span>
+                                                                                    <span className="mr-1">{dessert.name} </span>
+                                                                                 </li>
+                                                                              </div>
+                                                                           ))
+                                                                        }
+                                                                     </AccordionTrigger>
+                                                                     <AccordionContent className="pb-0">
+                                                                        {
+                                                                           item.combo_desserts.map((dessert, i) => (
+                                                                              <div className="flex text-xs">
+                                                                                 <span className="font-semibold">{++i}. </span>
+                                                                                 <li className="mr-1 mb-1">
+                                                                                    <span className="mr-1">name: {dessert.name},</span>
+                                                                                    <span className="mr-1">qty: {dessert.total_qty}, </span>
+                                                                                    <span className="mr-1">total price: ${Number(dessert.price) * Number(dessert.total_qty)}, </span>
+                                                                                    <span>ingredients:
+                                                                                       {(dessert.base_ingredient && dessert.base_ingredient.length > 0) &&
+                                                                                          dessert.base_ingredient.map((ing) => (
+                                                                                             <span> {ing.ing_name}, </span>
+                                                                                          ))
+                                                                                       }
+                                                                                    </span>
+                                                                                 </li>
+                                                                              </div>
+                                                                           ))
+                                                                        }
+                                                                     </AccordionContent>
+                                                                  </AccordionItem>
+                                                               </ul>
+                                                            </Accordion>
                                                          </div>
                                                       </>
                                                       : ""
