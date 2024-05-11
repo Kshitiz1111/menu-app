@@ -54,7 +54,7 @@ interface Product {
 
 const DishCard = () => {
    const [products, setProducts] = useState<Array<Product>>();
-   const [singleProduct, setSingleProduct] = useState<z.infer<typeof ProductFormSchema>>()
+   const [singleProduct, setSingleProduct] = useState<z.infer<typeof ProductFormSchema> | any>()
    const [openNote, setOpenNote] = useState<Boolean>(false);
    const loggedInUser = "guest";
 
@@ -91,7 +91,7 @@ const DishCard = () => {
          setSingleProduct({
             ...result.product,
             total_quantity: 1,
-            total_price: 1 * Number(result.product.product_price),
+            total_price: 1 * Number(result.product?.product_price),
          });
          // setSingleDish(JSON.stringify(result.product));
          // console.log('customer context product', JSON.parse(product))
@@ -103,7 +103,7 @@ const DishCard = () => {
    useEffect(() => {
       // Serialize the orders array to a JSON string
       function generateGuestId() {
-         return '_' + Math.random().toString(36).substr(2, 9);
+         return '_' + Math.random().toString(36).substring(2, 9);
       }
 
       // Check if a guest ID already exists
@@ -131,7 +131,7 @@ const DishCard = () => {
             products?.map((product, index) => {
                return (
 
-                  <Dialog>
+                  <Dialog key={index}>
                      <Card key={product.product_id}
                      >
                         <CardHeader>
@@ -168,7 +168,7 @@ const DishCard = () => {
                                        {
                                           singleProduct.base_ingredient && singleProduct.base_ingredient?.length > 0 &&
 
-                                          singleProduct.base_ingredient.map((baseing) => (
+                                          singleProduct.base_ingredient.map((baseing: any) => (
                                              <span className={'text-gray-500 font-semibold text-sm'}>{baseing.ing_name} ,</span>
                                           ))
                                        }
@@ -183,7 +183,7 @@ const DishCard = () => {
                                        {
                                           singleProduct.custom_ingredient && singleProduct.custom_ingredient?.length > 0 &&
 
-                                          singleProduct.custom_ingredient.map((customing, index) => (
+                                          singleProduct.custom_ingredient.map((customing: any, index: number) => (
                                              <div className="flex flex-wrap justify-between items-center mb-1">
                                                 <span className="text-gray-500 font-semibold text-sm">{customing.ing_name}</span>
                                                 <div className="flex gap-1">
@@ -244,7 +244,7 @@ const DishCard = () => {
                                     <div className="">
                                        {
                                           singleProduct.combo_drinks && singleProduct.combo_drinks?.length > 0 &&
-                                          singleProduct.combo_drinks.map((drink) => (
+                                          singleProduct.combo_drinks.map((drink: any) => (
                                              <div className="flex items-center gap-1 m-1">
                                                 <span className="text-sm bg-black rounded-full px-2 text-white">{drink.total_qty}</span>
                                                 <span className="text-gray text-md mr-2"> - {drink.name}</span>
@@ -261,7 +261,7 @@ const DishCard = () => {
                                     <div className="">
                                        {
                                           singleProduct.combo_desserts && singleProduct.combo_desserts?.length > 0 &&
-                                          singleProduct.combo_desserts.map((dessert) => (
+                                          singleProduct.combo_desserts.map((dessert: any) => (
                                              <div className="flex items-center gap-1 m-1">
                                                 <span className="text-sm bg-black rounded-full px-2 text-white">{dessert.total_qty}</span>
                                                 <span className="text-gray text-md mr-2"> - {dessert.name}</span>
@@ -326,7 +326,7 @@ const DishCard = () => {
                                                 ></Input>
                                              </TooltipTrigger>
                                              {
-                                                (singleProduct.total_quantity == "") ? <TooltipContent className="bg-red-500 text-white" forceMount={(singleProduct.total_quantity == "") ? true : false} >
+                                                (singleProduct.total_quantity == "") ? <TooltipContent className="bg-red-500 text-white" forceMount={singleProduct.total_quantity === "" ? true : undefined}>
                                                    <p>enter quantity</p>
                                                 </TooltipContent>
                                                    : false

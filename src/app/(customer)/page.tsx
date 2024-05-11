@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button"
 import { useSearchParams } from 'next/navigation'
 import { useOrderContext } from '@/context/orderContext'
 import type { orderContextType } from "@/context/orderContext"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { paymentVerificationLookup } from "@/lib/actions/payment.action"
 import { OrderType } from "@/types/orders"
+
 
 interface TransactionDetails {
    pidx: string;
@@ -28,7 +29,14 @@ interface toastInfoType {
    description: string;
    status: boolean;
 }
+
+
+
 const CustomerPage = () => {
+
+   // Create a ref to track if the effect has run
+   const hasRun = useRef(false);
+
    const searchParams = useSearchParams()
    let [toastInfo, setToastInfo] = useState<toastInfoType | undefined>(undefined);
 
@@ -47,7 +55,7 @@ const CustomerPage = () => {
          acc[key] = value;
          return acc;
       }, {});
-      console.log(transactionDetails)
+      console.log("transactionDetails: ", transactionDetails)
       const verifyPayment = async () => {
          const response = await paymentVerificationLookup(transactionDetails.pidx);
          const data = await response?.json();
@@ -123,71 +131,82 @@ const CustomerPage = () => {
                      await verifyPayment();
                   })();
                }
-               //store completed order in database
-               if (transactionDetails.status === "Completed") {
-                  let currentOrderItem = orders.filter((order) => order.purchase_order_id === transactionDetails.purchase_order_id);
+               /* 
+               remove use ref in production
+               */
+               if (!hasRun.current) {
+                  //store completed order in database
+                  if (transactionDetails.status === "Completed") {
+                     // Your database storage logic here...
+                     //store completed order in database
+                     if (transactionDetails.status === "Completed") {
+                        let currentOrderItem = orders.filter((order) => order.purchase_order_id === transactionDetails.purchase_order_id);
 
-                  let filteredOrderItems = currentOrderItem.map((order) => {
-                     return (
-                        {
-                           product_id: Number(order.product_id),
-                           total_quantity: Number(order.total_quantity),
-                           total_price: Number(order.total_price),
-                           customer_note: order.customer_note,
-                           customized_ingredients: (order.custom_ingredient && order.custom_ingredient?.length > 0) ? order.custom_ingredient.filter((ing) => Number(ing.ing_qty) > 0) : null,
-                        }
-                     )
-                  });
-                  console.log("filteredOrderItems", filteredOrderItems);
-                  let payload: OrderType = {
-                     purchase_order_id: transactionDetails.purchase_order_id,
-                     no_of_item: filteredOrderItems.length,
-                     total_price: transactionDetails.total_amount / 100,
-                     compensation: null,
-                     status: "paid",
-                     details: filteredOrderItems,
-                  };
-                  (async () => {
-                     try {
-                        // Create the fetch request
-                        const response = await fetch('http://localhost:3000/api/orders', {
-                           method: 'POST', // Specify the method
-                           headers: {
-                              'Content-Type': 'application/json', // Set the content type header
-                           },
-                           body: JSON.stringify(payload), // Convert the payload to a JSON string
+                        let filteredOrderItems = currentOrderItem.map((order) => {
+                           return (
+                              {
+                                 product_id: Number(order.product_id),
+                                 total_quantity: Number(order.total_quantity),
+                                 total_price: Number(order.total_price),
+                                 customer_note: order.customer_note,
+                                 customized_ingredients: (order.custom_ingredient && order.custom_ingredient?.length > 0) ? order.custom_ingredient.filter((ing) => Number(ing.ing_qty) > 0) : null,
+                              }
+                           )
                         });
+                        console.log("filteredOrderItems", filteredOrderItems);
+                        let payload: OrderType = {
+                           purchase_order_id: transactionDetails.purchase_order_id,
+                           no_of_item: filteredOrderItems.length,
+                           total_price: transactionDetails.total_amount / 100,
+                           compensation: null,
+                           status: "paid",
+                           details: filteredOrderItems,
+                        };
+                        (async () => {
+                           try {
+                              // Create the fetch request
+                              const response = await fetch('http://localhost:3000/api/orders', {
+                                 method: 'POST', // Specify the method
+                                 headers: {
+                                    'Content-Type': 'application/json', // Set the content type header
+                                 },
+                                 body: JSON.stringify(payload), // Convert the payload to a JSON string
+                              });
 
-                        // Check if the request was successful
-                        if (!response.ok) {
-                           throw new Error('Network response was not ok');
-                        }
+                              // Check if the request was successful
+                              if (!response.ok) {
+                                 throw new Error('Network response was not ok');
+                              }
 
-                        // Parse the response
-                        const data = await response.json();
+                              // Parse the response
+                              const data = await response.json();
 
-                        console.log('Success:', data);
-                     } catch (error) {
-                        console.error('Error:', error);
+                              console.log('Success:', data);
+                           } catch (error) {
+                              console.error('Error:', error);
+                           }
+                        })()
                      }
-                  })()
+                  }
+
+
+                  // Now, you can use setOrders to update your state with the new array
+                  setOrders(updatedOrders);
+                  let guestId = localStorage.getItem('guestId');
+
+                  const ordersWithUserId: any = {
+                     orders: [...orders],
+                     userId: guestId, // Use the guest ID for guests
+                  };
+
+                  const ordersString = JSON.stringify(ordersWithUserId);
+                  localStorage.setItem('orders', ordersString);
+                  console.log("totalOrder after edit from cart", ordersWithUserId,);
+                  // Mark the effect as having run
+                  hasRun.current = true;
                }
-
-               // Now, you can use setOrders to update your state with the new array
-               setOrders(updatedOrders);
-               let guestId = localStorage.getItem('guestId');
-
-               const ordersWithUserId: any = {
-                  orders: [...orders],
-                  userId: guestId, // Use the guest ID for guests
-               };
-
-               const ordersString = JSON.stringify(ordersWithUserId);
-               localStorage.setItem('orders', ordersString);
-               console.log("totalOrder after edit from cart", ordersWithUserId,);
-
             } catch (error) {
-               console.log("error", error)
+               console.log("error", error);
             }
          }
       }, [])
@@ -196,7 +215,7 @@ const CustomerPage = () => {
          setTimeout(() => {
             window.history.pushState({}, document.title, "/" + "");
             console.log("time our run")
-         }, 10000)
+         }, 1000)
       }
    }
 
