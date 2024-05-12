@@ -26,7 +26,7 @@ const CartItem = () => {
    // setOrders(selectedProducts)
 
    const updateQuantity = (id: any, quantity: any) => {
-      setOrders(orders.map(item => item.product_id == id ? { ...item, total_quantity: quantity, total_price: Math.ceil(Number(item.product_price)) * Number(quantity) } : item));
+      setOrders(orders.map(item => item.product_id == id ? { ...item, total_quantity: quantity, total_price: (Number(item.product_price) * Number(quantity)).toFixed(2) } : item));
    };
 
    const removeItem = (id: any) => {
@@ -68,7 +68,7 @@ const CartItem = () => {
                            <div className="cart-item flex flex-wrap items-center justify-between">
                               <div className="">
                                  <h4 className="text-lg font-semibold text-gray-800">{item.product_name}</h4>
-                                 <p className="absolute top-0 right-0 py-0 px-2 text-gray-500 text-sm text-gray-500">${Math.ceil(Number(item.total_price))}</p>
+                                 <p className="absolute top-0 right-0 py-0 px-2 text-gray-500 text-sm text-gray-500">${Number(item.total_price)}</p>
                               </div>
                               <div className="flex items-center w-full gap-1">
                                  <button
