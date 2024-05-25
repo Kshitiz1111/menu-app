@@ -70,15 +70,15 @@ const OrderedItem = () => {
       <div className=" overflow-y-scroll h-screen">
          {orderedStack &&
             orderedStack.map((stack, i) =>
-               <div className=" bg-gray-200 my-2 rounded-md p-2">
+               <div key={i} className=" bg-gray-200 my-2 rounded-md p-2">
                   <div className=" flex font-semibold items-center text-gray-900 gap-1">
                      <span className="font-xl">{++i}.</span>
                      <p className="text-sm">{stack.orderId}</p>
                   </div>
                   {orders &&
-                     orders.map((item: z.infer<typeof ProductFormSchema>) => {
+                     orders.map((item: z.infer<typeof ProductFormSchema>, index: number) => {
                         return (
-                           <div>
+                           <div key={index}>
                               {(item.purchase_confirm && (stack.orderId === item.purchase_order_id)) ?
                                  <div className="relative p-2 bg-white rounded-md text-gray-700 shadow-md mb-2">
                                     <div className="cart-item flex flex-wrap items-center justify-between">
@@ -116,7 +116,7 @@ const OrderedItem = () => {
                                                          <div className="flex flex-wrap px-1">
                                                             {
                                                                item.custom_ingredient.map((ing, i) => (
-                                                                  <div className="flex">
+                                                                  <div key={i} className="flex">
                                                                      <span className="font-semibold">{++i}. </span>
                                                                      <span className={`${Number(ing.ing_qty) === 0 ? 'line-through' : ''} mr-1`} >
                                                                         {ing.ing_name}
@@ -145,7 +145,7 @@ const OrderedItem = () => {
                                                                      <AccordionTrigger className='py-0 text-xs justify-normal'>
                                                                         {
                                                                            item.combo_drinks.map((drink, i) => (
-                                                                              <div className="flex">
+                                                                              <div key={i} className="flex">
                                                                                  <li className="mr-1 mb-1">
                                                                                     <span className="mr-1 bg-gray-400 rounded-full px-1">{drink.total_qty}</span>
                                                                                     <span className="mr-1">{drink.name} </span>
@@ -157,7 +157,7 @@ const OrderedItem = () => {
                                                                      <AccordionContent className="pb-0">
                                                                         {
                                                                            item.combo_drinks.map((drink, i) => (
-                                                                              <div className="flex text-xs">
+                                                                              <div key={i} className="flex text-xs">
                                                                                  <span className="font-semibold">{++i}. </span>
                                                                                  <li className="mr-1 mb-1">
                                                                                     <span className="mr-1">name: {drink.name},</span>
@@ -165,8 +165,8 @@ const OrderedItem = () => {
                                                                                     <span className="mr-1">total price: ${Number(drink.price) * Number(drink.total_qty)}, </span>
                                                                                     <span>ingredients:
                                                                                        {(drink.base_ingredient && drink.base_ingredient.length > 0) &&
-                                                                                          drink.base_ingredient.map((ing) => (
-                                                                                             <span> {ing.ing_name}, </span>
+                                                                                          drink.base_ingredient.map((ing, index: number) => (
+                                                                                             <span key={i}> {ing.ing_name}, </span>
                                                                                           ))
                                                                                        }
                                                                                     </span>
@@ -195,7 +195,7 @@ const OrderedItem = () => {
                                                                      <AccordionTrigger className='py-0 text-xs justify-normal'>
                                                                         {
                                                                            item.combo_desserts.map((dessert, i) => (
-                                                                              <div className="flex">
+                                                                              <div key={i} className="flex">
                                                                                  <li className="mr-1 mb-1">
                                                                                     <span className="mr-1 bg-gray-400 rounded-full px-1">{dessert.total_qty}</span>
                                                                                     <span className="mr-1">{dessert.name} </span>
@@ -207,7 +207,7 @@ const OrderedItem = () => {
                                                                      <AccordionContent className="pb-0">
                                                                         {
                                                                            item.combo_desserts.map((dessert, i) => (
-                                                                              <div className="flex text-xs">
+                                                                              <div key={i} className="flex text-xs">
                                                                                  <span className="font-semibold">{++i}. </span>
                                                                                  <li className="mr-1 mb-1">
                                                                                     <span className="mr-1">name: {dessert.name},</span>
@@ -215,8 +215,8 @@ const OrderedItem = () => {
                                                                                     <span className="mr-1">total price: ${Number(dessert.price) * Number(dessert.total_qty)}, </span>
                                                                                     <span>ingredients:
                                                                                        {(dessert.base_ingredient && dessert.base_ingredient.length > 0) &&
-                                                                                          dessert.base_ingredient.map((ing) => (
-                                                                                             <span> {ing.ing_name}, </span>
+                                                                                          dessert.base_ingredient.map((ing, index: number) => (
+                                                                                             <span key={index}> {ing.ing_name}, </span>
                                                                                           ))
                                                                                        }
                                                                                     </span>

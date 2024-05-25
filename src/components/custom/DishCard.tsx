@@ -187,8 +187,8 @@ const DishCard = () => {
                                        {
                                           singleProduct.base_ingredient && singleProduct.base_ingredient?.length > 0 &&
 
-                                          singleProduct.base_ingredient.map((baseing: any) => (
-                                             <span className={'text-gray-500 font-semibold text-sm'}>{baseing.ing_name} ,</span>
+                                          singleProduct.base_ingredient.map((baseing: any, index: number) => (
+                                             <span key={index} className={'text-gray-500 font-semibold text-sm'}>{baseing.ing_name} ,</span>
                                           ))
                                        }
                                     </div>
@@ -203,7 +203,7 @@ const DishCard = () => {
                                           singleProduct.custom_ingredient && singleProduct.custom_ingredient?.length > 0 &&
 
                                           singleProduct.custom_ingredient.map((customing: any, index: number) => (
-                                             <div className="flex flex-wrap justify-between items-center mb-1">
+                                             <div key={index} className="flex flex-wrap justify-between items-center mb-1">
                                                 <span className="text-gray-500 font-semibold text-sm">{customing.ing_name}</span>
                                                 <div className="flex gap-1">
                                                    <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
@@ -280,8 +280,8 @@ const DishCard = () => {
                                                 <AccordionItem value="item-1" className="border-0">
                                                    <AccordionTrigger className='py-0 text-xs justify-normal flex flex-wrap gap-1'>
                                                       {
-                                                         singleProduct.combo_drinks.map((drink: any) => (
-                                                            <div className="flex items-center gap-1">
+                                                         singleProduct.combo_drinks.map((drink: any, index: number) => (
+                                                            <div key={index} className="flex items-center gap-1">
                                                                <span className="text-sm bg-black rounded-full px-2 text-white">{drink.total_qty}</span>
                                                                <span className="text-gray text-md mr-2"> {drink.name}</span>
                                                             </div>
@@ -291,14 +291,14 @@ const DishCard = () => {
                                                    <AccordionContent className="pb-0 px-2">
                                                       {
                                                          singleProduct.combo_drinks.map((drink: any, i: number) => (
-                                                            <div className="flex text-xs">
+                                                            <div key={i} className="flex text-xs">
                                                                <span className="font-semibold">{++i}. </span>
                                                                <li className="mr-1 mb-1">
                                                                   <span className="mr-1">name: {drink.name},</span>
                                                                   <span>ingredients:
                                                                      {(drink.base_ingredient && drink.base_ingredient.length > 0) &&
-                                                                        drink.base_ingredient.map((ing: any) => (
-                                                                           <span> {ing.ing_name}, </span>
+                                                                        drink.base_ingredient.map((ing: any, index: number) => (
+                                                                           <span key={index}> {ing.ing_name}, </span>
                                                                         ))
                                                                      }
                                                                   </span>
@@ -321,8 +321,8 @@ const DishCard = () => {
                                     <div className="">
                                        {
                                           singleProduct.combo_desserts && singleProduct.combo_desserts?.length > 0 &&
-                                          singleProduct.combo_desserts.map((dessert: any) => (
-                                             <div className="flex items-center gap-1 m-1">
+                                          singleProduct.combo_desserts.map((dessert: any, index: number) => (
+                                             <div key={index} className="flex items-center gap-1 m-1">
                                                 <span className="text-sm bg-black rounded-full px-2 text-white">{dessert.total_qty}</span>
                                                 <span className="text-gray text-md mr-2"> - {dessert.name}</span>
                                              </div>
