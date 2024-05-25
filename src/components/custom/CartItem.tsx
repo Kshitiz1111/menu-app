@@ -47,14 +47,14 @@ const CartItem = () => {
       localStorage.setItem('orders', ordersString);
       // console.log("totalOrder after edit from cart", ordersWithUserId,);
       console.log("hello")
-   }, [orders])
+   }, [orders]);
    return (
       <div className=" overflow-y-scroll h-screen">
          {orders &&
-            orders.map((item: z.infer<typeof ProductFormSchema>) => {
+            orders.map((item: z.infer<typeof ProductFormSchema>, index: number) => {
 
                return (
-                  <div>
+                  <div key={index}>
                      {(!item.purchase_confirm) ?
                         <div className="relative p-4 bg-white shadow-md rounded-lg mb-4">
                            <Image
