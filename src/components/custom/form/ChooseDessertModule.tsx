@@ -133,8 +133,8 @@ const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFor
                         <span onClick={() => closeModal()} className='cursor-pointer p-1 font-bold'>X</span>
                         <div id='search result' className=''>
                            <div className='flex flex-wrap gap-2 p-2 '>
-                              {searchResult?.map((dessert) =>
-                                 <span className='flex items-center gap-1 border border-black p-2 rounded-md'>{dessert?.name}
+                              {searchResult?.map((dessert, index: number) =>
+                                 <span key={index} className='flex items-center gap-1 border border-black p-2 rounded-md'>{dessert?.name}
                                     <Checkbox className='w-5 h-5'
                                        checked={selectedDesserts?.some((item) => item.id === dessert.id)}
                                        onClick={() => {
@@ -163,6 +163,7 @@ const ChooseDessertModule = ({ isCombo, form }: { isCombo: boolean, form: UseFor
                         {selectedDesserts?.length === 0 && <p className='px-4 py-2 bg-gray-200 text-sm'>No Dessert Selected!</p>}
                         {selectedDesserts?.map((dessert, index) => (
                            <FormField
+                              key={index}
                               control={form.control}
                               name='combo_desserts'
                               render={({ field }) => (

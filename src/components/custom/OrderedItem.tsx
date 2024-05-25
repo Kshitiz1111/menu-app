@@ -99,8 +99,8 @@ const OrderedItem = () => {
                                                          <span className="font-semibold">base ingredients</span>
                                                          <div className="flex flex-wrap px-1">
                                                             {
-                                                               item.base_ingredient.map((ing) => (
-                                                                  <span className="mr-1">{ing.ing_name},</span>
+                                                               item.base_ingredient.map((ing, i: number) => (
+                                                                  <span className="mr-1" key={i}>{ing.ing_name},</span>
                                                                ))
                                                             }
 

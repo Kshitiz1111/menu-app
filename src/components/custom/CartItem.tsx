@@ -97,8 +97,8 @@ const CartItem = () => {
                                                 <span className="font-semibold">base ingredients</span>
                                                 <div className="flex flex-wrap px-1">
                                                    {
-                                                      item.base_ingredient.map((ing) => (
-                                                         <span className="mr-1">{ing.ing_name},</span>
+                                                      item.base_ingredient.map((ing, index: number) => (
+                                                         <span key={index} className="mr-1">{ing.ing_name},</span>
                                                       ))
                                                    }
 
@@ -113,8 +113,8 @@ const CartItem = () => {
                                                 <span className="font-semibold">custom ingredients</span>
                                                 <div className="flex flex-wrap px-1">
                                                    {
-                                                      item.custom_ingredient.map((ing, i) => (
-                                                         <div className="flex">
+                                                      item.custom_ingredient.map((ing, i: number) => (
+                                                         <div className="flex" key={i}>
                                                             <span className="font-semibold">{++i}. </span>
                                                             <span className={`${Number(ing.ing_qty) === 0 ? 'line-through' : ''} mr-1`} >
                                                                {ing.ing_name}
@@ -139,8 +139,8 @@ const CartItem = () => {
                                                    <span className="font-semibold">combo drinks</span>
                                                    <ul className="px-1">
                                                       {
-                                                         item.combo_drinks.map((drink, i) => (
-                                                            <div className="flex">
+                                                         item.combo_drinks.map((drink, i: number) => (
+                                                            <div className="flex" key={i}>
                                                                <span className="font-semibold">{++i}. </span>
                                                                <li className="mr-1 mb-1">
                                                                   <span className="mr-1">name: {drink.name},</span>
@@ -165,8 +165,8 @@ const CartItem = () => {
                                                    <span className="font-semibold">combo dessert</span>
                                                    <ul className="px-1">
                                                       {
-                                                         item.combo_desserts.map((dessert, i) => (
-                                                            <div className="flex">
+                                                         item.combo_desserts.map((dessert, i: number) => (
+                                                            <div className="flex" key={i}>
                                                                <span className="font-semibold">{++i}. </span>
                                                                <li className="mr-1 mb-1">
                                                                   <span className="mr-1">name: {dessert.name},</span>

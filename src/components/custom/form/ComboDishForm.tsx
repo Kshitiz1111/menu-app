@@ -102,7 +102,7 @@ const ComboDishForm = ({ form, baseFields, appendBase, removeBase }: { form: Use
                      <FormControl>
                         <div className="flex flex-col flex-wrap gap-4">
                            {baseFields.map((field: any, index: any) => (
-                              <div className='relative mt-1'>
+                              <div key={index} className='relative mt-1'>
                                  <div className='gap-1'>
                                     {(baseFields.length !== 0 && baseFields.length - 1 !== index) ?
                                        <div key={field.id} className="flex items-center px-1">
