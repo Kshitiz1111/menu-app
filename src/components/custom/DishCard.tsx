@@ -84,11 +84,7 @@ const DishCard = () => {
    }, [])
 
    const context = useOrderContext()
-   if (!context) {
-      // Return null or some fallback UI
-      return null;
-   }
-   const { setOrders, orders } = context as orderContextType;
+
 
    const handleSelect = async (dish: any) => {
       try {
@@ -121,6 +117,9 @@ const DishCard = () => {
 
    useEffect(() => {
       // Serialize the orders array to a JSON string
+      if (!context) return;
+
+      const { orders } = context as orderContextType;
       function generateGuestId() {
          return '_' + Math.random().toString(36).substring(2, 9);
       }
@@ -144,6 +143,11 @@ const DishCard = () => {
 
    }, [orders])
 
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+   const { setOrders, orders } = context as orderContextType;
    return (
       <div className="flex flex-wrap gap-1">
          {(products && products.length > 0) ?

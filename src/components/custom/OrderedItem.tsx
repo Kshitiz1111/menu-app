@@ -21,11 +21,7 @@ interface orderedStackType {
 }
 const OrderedItem = () => {
    const context = useOrderContext()
-   if (!context) {
-      // Return null or some fallback UI
-      return null;
-   }
-   const { setOrders, orders } = context as orderContextType;
+
    // setOrders(selectedProducts)
 
    // const updateQuantity = (id: any, quantity: any) => {
@@ -51,6 +47,11 @@ const OrderedItem = () => {
       // console.log("totalOrder after edit from cart", ordersWithUserId,);
 
    }, [orders])
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+   const { setOrders, orders } = context as orderContextType;
 
    let orderedStack: orderedStackType[] = [];
    orders.map((item) => {
