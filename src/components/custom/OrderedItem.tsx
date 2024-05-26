@@ -32,7 +32,7 @@ const OrderedItem = () => {
    //    setOrders(orders.filter(item => item.product_id !== id));
    // };
    // console.log("orders cart", orders)
-
+   let orders: any;
    useEffect(() => {
       // Check if a guest ID already exists
       let guestId = localStorage.getItem('guestId');
@@ -51,7 +51,8 @@ const OrderedItem = () => {
       // Return null or some fallback UI
       return null;
    }
-   const { setOrders, orders } = context as orderContextType;
+   orders = context as orderContextType;
+   const { setOrders } = context as orderContextType;
 
    let orderedStack: orderedStackType[] = [];
    orders.map((item) => {

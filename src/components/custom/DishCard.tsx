@@ -114,6 +114,7 @@ const DishCard = () => {
          console.log(error)
       }
    }
+   let orders: any;
 
    useEffect(() => {
       // Serialize the orders array to a JSON string
@@ -147,7 +148,8 @@ const DishCard = () => {
       // Return null or some fallback UI
       return null;
    }
-   const { setOrders, orders } = context as orderContextType;
+   orders = context as orderContextType;
+   const { setOrders } = context as orderContextType;
    return (
       <div className="flex flex-wrap gap-1">
          {(products && products.length > 0) ?
