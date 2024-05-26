@@ -19,7 +19,7 @@ const OrderBtn = () => {
    useEffect(() => {
       let price = 0;
       let itemsLength = 0;
-      orders.map((item) => {
+      orders.map((item: any) => {
          if (!item.purchase_confirm) {
             price += Number(item.total_price);
             itemsLength++;
@@ -98,7 +98,7 @@ const OrderBtn = () => {
                console.log("khalti initial payment success: ", data);
                let guestId = localStorage.getItem('guestId');
 
-               setOrders(orders.map((item) => {
+               setOrders(orders.map((item: any) => {
                   // Check if item.purchase_confirm is false or undefined
                   if (item.purchase_confirm === false || item.purchase_confirm === undefined) {
                      // If the condition is met, return a new object with the modified purchase_order_id

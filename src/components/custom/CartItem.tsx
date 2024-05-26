@@ -45,11 +45,11 @@ const CartItem = () => {
    // setOrders(selectedProducts)
 
    const updateQuantity = (id: any, quantity: any) => {
-      setOrders(orders.map(item => item.product_id == id ? { ...item, total_quantity: quantity, total_price: (Number(item.product_price) * Number(quantity)).toFixed(2) } : item));
+      setOrders(orders.map((item: any) => item.product_id == id ? { ...item, total_quantity: quantity, total_price: (Number(item.product_price) * Number(quantity)).toFixed(2) } : item));
    };
 
    const removeItem = (id: any) => {
-      setOrders(orders.filter(item => item.product_id !== id));
+      setOrders(orders.filter((item: any) => item.product_id !== id));
    };
    // console.log("orders cart", orders)
    return (
