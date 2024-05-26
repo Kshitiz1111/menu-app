@@ -157,7 +157,9 @@ const CustomerPage = () => {
                      )
                   });
                   console.log("filteredOrderItems", filteredOrderItems);
-                  let payload: OrderType = {
+                  //let payload: OrderType = {
+
+                  let payload: any = {
                      purchase_order_id: transactionDetails.purchase_order_id,
                      no_of_item: filteredOrderItems.length,
                      total_price: transactionDetails.total_amount / 100,
