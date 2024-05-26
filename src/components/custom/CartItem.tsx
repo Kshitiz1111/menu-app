@@ -18,6 +18,24 @@ import { Button } from "../ui/button";
 
 const CartItem = () => {
    const context = useOrderContext()
+   useEffect(() => {
+      if (!context) return;
+
+      const { orders } = context as orderContextType;
+      // Check if a guest ID already exists
+      let guestId = localStorage.getItem('guestId');
+
+      const ordersWithUserId: any = {
+         orders: [...orders],
+         userId: guestId, // Use the guest ID for guests
+      };
+
+      const ordersString = JSON.stringify(ordersWithUserId);
+      localStorage.setItem('orders', ordersString);
+      // console.log("totalOrder after edit from cart", ordersWithUserId,);
+      console.log("hello")
+   }, [orders]);
+
    if (!context) {
       // Return null or some fallback UI
       return null;
@@ -33,21 +51,6 @@ const CartItem = () => {
       setOrders(orders.filter(item => item.product_id !== id));
    };
    // console.log("orders cart", orders)
-
-   useEffect(() => {
-      // Check if a guest ID already exists
-      let guestId = localStorage.getItem('guestId');
-
-      const ordersWithUserId: any = {
-         orders: [...orders],
-         userId: guestId, // Use the guest ID for guests
-      };
-
-      const ordersString = JSON.stringify(ordersWithUserId);
-      localStorage.setItem('orders', ordersString);
-      // console.log("totalOrder after edit from cart", ordersWithUserId,);
-      console.log("hello")
-   }, [orders]);
    return (
       <div className=" overflow-y-scroll h-screen">
          {orders &&

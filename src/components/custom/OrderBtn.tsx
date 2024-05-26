@@ -15,11 +15,6 @@ const OrderBtn = () => {
    const tempOrderId = generateUniquePurchaseOrderId();
 
    const context = useOrderContext()
-   if (!context) {
-      // Return null or some fallback UI
-      return null;
-   }
-   const { orders, setOrders } = context as orderContextType;
 
    useEffect(() => {
       let price = 0;
@@ -33,6 +28,12 @@ const OrderBtn = () => {
       setTotalItem(itemsLength);
       setTotalPrice(price);
    }, [orders])
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+   const { orders, setOrders } = context as orderContextType;
+
 
    function generateUniquePurchaseOrderId() {
       // Get the current timestamp
