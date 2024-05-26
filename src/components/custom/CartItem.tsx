@@ -15,7 +15,7 @@ import type { orderContextType } from "@/context/orderContext"
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 
-
+let orders: any;
 const CartItem = () => {
    const context = useOrderContext()
    useEffect(() => {
@@ -40,7 +40,8 @@ const CartItem = () => {
       // Return null or some fallback UI
       return null;
    }
-   const { setOrders, orders } = context as orderContextType;
+   orders = context as orderContextType;
+   const { setOrders } = context as orderContextType;
    // setOrders(selectedProducts)
 
    const updateQuantity = (id: any, quantity: any) => {

@@ -15,7 +15,7 @@ const OrderBtn = () => {
    const tempOrderId = generateUniquePurchaseOrderId();
 
    const context = useOrderContext()
-
+   let orders: any;
    useEffect(() => {
       let price = 0;
       let itemsLength = 0;
@@ -32,7 +32,8 @@ const OrderBtn = () => {
       // Return null or some fallback UI
       return null;
    }
-   const { orders, setOrders } = context as orderContextType;
+   orders = context as orderContextType;
+   const { setOrders } = context as orderContextType;
 
 
    function generateUniquePurchaseOrderId() {
