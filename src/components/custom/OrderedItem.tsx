@@ -55,7 +55,7 @@ const OrderedItem = () => {
    const { setOrders } = context as orderContextType;
 
    let orderedStack: orderedStackType[] = [];
-   orders.map((item) => {
+   orders.map((item: any) => {
       if (item.purchase_confirm && item.purchase_order_id) {
 
          const orderIdExists = orderedStack.some(stack => stack.orderId === item.purchase_order_id)
