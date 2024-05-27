@@ -89,7 +89,7 @@ const DishCard = () => {
    const handleSelect = async (dish: any) => {
       try {
          let result = await getSingleProduct(dish);
-         // setSingleProduct(result.product)
+         // @ts-ignore
          setSingleProduct({
             ...result.product,
             custom_ingredient: (result.product?.custom_ingredient && result.product.custom_ingredient.length > 0) ? result.product.custom_ingredient.map((customIngredient: any) => {
