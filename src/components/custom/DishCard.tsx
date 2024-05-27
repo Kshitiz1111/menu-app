@@ -92,9 +92,9 @@ const DishCard = () => {
          // setSingleProduct(result.product)
          setSingleProduct({
             ...result.product,
-            custom_ingredient: (result.product.custom_ingredient && result.product.custom_ingredient.length > 0) ? result.product.custom_ingredient.map((customIngredient) => {
-               const matchingBaseIngredient = result.product.base_ingredient.find(
-                  (baseIngredient) => baseIngredient.ing_name === customIngredient.ing_name
+            custom_ingredient: (result.product?.custom_ingredient && result.product.custom_ingredient.length > 0) ? result.product.custom_ingredient.map((customIngredient: any) => {
+               const matchingBaseIngredient = result.product.base_ingredient?.find(
+                  (baseIngredient: any) => baseIngredient.ing_name === customIngredient.ing_name
                );
                if (matchingBaseIngredient) {
                   return {
