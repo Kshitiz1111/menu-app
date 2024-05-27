@@ -27,7 +27,7 @@ import { useEditProductContext } from '@/context/editProductContext'
 const UpdateProductForm = () => {
 
    const context = useEditProductContext();
-   let toBeEditedProduct;
+   let toBeEditedProduct: any;
    console.log(toBeEditedProduct)
    // 1. Define your form.
    const form = useForm<z.infer<typeof ProductFormSchema>>({
