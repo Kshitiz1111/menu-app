@@ -21,7 +21,7 @@ const CartItem = () => {
    useEffect(() => {
       if (!context) return;
 
-      const { orders } = context as orderContextType;
+      const { orders, setOrders } = context as any;
       // Check if a guest ID already exists
       let guestId = localStorage.getItem('guestId');
 
@@ -40,8 +40,10 @@ const CartItem = () => {
       // Return null or some fallback UI
       return null;
    }
-   orders = context as orderContextType;
-   const { setOrders } = context as orderContextType;
+
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
    // setOrders(selectedProducts)
 
    const updateQuantity = (id: any, quantity: any) => {

@@ -40,7 +40,7 @@ import { ProductFormSchema } from "@/lib/validator"
 import { z } from "zod"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
-import type { orderContextType } from "@/context/orderContext"
+// import type { orderContextType } from "@/context/orderContext"
 
 interface Product {
    baseing_ids: number[] | null;
@@ -119,11 +119,11 @@ const DishCard = () => {
       // Serialize the orders array to a JSON string
       if (!context) return;
 
-      const { orders } = context as orderContextType;
+      const { orders, setOrders } = context as any;
       function generateGuestId() {
          return '_' + Math.random().toString(36).substring(2, 9);
       }
-
+      console.log("orders", orders)
       // Check if a guest ID already exists
       let guestId = localStorage.getItem('guestId');
       if (!guestId) {
@@ -147,8 +147,9 @@ const DishCard = () => {
       // Return null or some fallback UI
       return null;
    }
-   orders = context as orderContextType;
-   const { setOrders } = context as orderContextType;
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
    return (
       <div className="flex flex-wrap gap-1">
          {(products && products.length > 0) ?
