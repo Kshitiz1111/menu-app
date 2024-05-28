@@ -14,7 +14,7 @@ const OrderBtn = () => {
    const vatPercentage = 0.13;
    const tempOrderId = generateUniquePurchaseOrderId();
 
-   const context = useOrderContext()
+   const context: any = useOrderContext()
    let orders: any;
    useEffect(() => {
       let price = 0;
