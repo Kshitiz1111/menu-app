@@ -32,8 +32,10 @@ const OrderBtn = () => {
       // Return null or some fallback UI
       return null;
    }
-   orders = context as orderContextType;
-   const { setOrders } = context as orderContextType;
+
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
 
 
    function generateUniquePurchaseOrderId() {

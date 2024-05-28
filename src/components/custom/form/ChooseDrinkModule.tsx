@@ -40,7 +40,7 @@ interface Dessert {
 
 const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormReturn<z.infer<typeof ProductFormSchema>> }) => {
    const [searchResult, setSearchResult] = useState<Array<Drink>>();
-   const [selectedDrinks, setSelectedDrinks] = useState<Array<Drink>>(form.getValues('combo_drinks'));
+   const [selectedDrinks, setSelectedDrinks] = useState<Array<Drink> | any>(form.getValues('combo_drinks'));
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [hasQuery, setHasQuery] = useState<boolean>(false);
 
@@ -52,7 +52,7 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
          // Prepare the new array for combo_drinks
          const updatedComboDrinks = form.getValues('combo_drinks')?.map(existedItem => {
             // Find the corresponding item in selectedDrinks
-            const selectedItem = selectedDrinks.find(item => item.id === existedItem.id);
+            const selectedItem = selectedDrinks.find((item: any) => item.id === existedItem.id);
             if (selectedItem) {
                // If the item exists, update its drink_total_count
                return { ...existedItem, total_qty: selectedItem.total_qty };
@@ -62,7 +62,7 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
          }) || []; // Fallback to an empty array if combo_drinks is undefined
 
          // Add new items from selectedDrinks that are not in combo_drinks
-         const newItems = selectedDrinks.filter(selectedItem => !updatedComboDrinks.some(existedItem => existedItem.id === selectedItem.id));
+         const newItems = selectedDrinks.filter((selectedItem: any) => !updatedComboDrinks.some(existedItem => existedItem.id === selectedItem.id));
          updatedComboDrinks.push(...newItems);
 
          // Update the form state with the new array
@@ -141,10 +141,10 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
                               {searchResult?.map((drink, index: number) =>
                                  <span key={index} className='flex items-center gap-1 border border-black p-2 rounded-md'>{drink?.name}
                                     <Checkbox className='w-5 h-5'
-                                       checked={selectedDrinks?.some((item) => item.id === drink.id)}
+                                       checked={selectedDrinks?.some((item: any) => item.id === drink.id)}
                                        onClick={() => {
-                                          selectedDrinks?.some((item) => item.id === drink.id)
-                                             ? setSelectedDrinks(selectedDrinks.filter((item) => item.id !== drink.id))
+                                          selectedDrinks?.some((item: any) => item.id === drink.id)
+                                             ? setSelectedDrinks(selectedDrinks.filter((item: any) => item.id !== drink.id))
                                              : setSelectedDrinks([...(selectedDrinks ?? []), drink])
 
                                        }}
@@ -166,7 +166,7 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
 
                         <span className='text-sm font-semibold p-2'>Selected {(form.getValues("product_type") == "dessert") ? "Desserts" : "Drinks"}</span>
                         {selectedDrinks?.length === 0 && <p className='px-4 py-2 bg-gray-200 text-sm'>No Drinks Selected!</p>}
-                        {selectedDrinks?.map((drink, index) => (
+                        {selectedDrinks?.map((drink: any, index: number) => (
                            <FormField
                               key={index}
                               control={form.control}
@@ -176,9 +176,9 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
                                     <div className="flex items-center">
                                        <Checkbox
                                           className='w-5 h-5 mr-2'
-                                          checked={selectedDrinks?.some((item) => item.id === drink.id)}
+                                          checked={selectedDrinks?.some((item: any) => item.id === drink.id)}
                                           onClick={() => {
-                                             setSelectedDrinks(selectedDrinks.filter((item, i) => item.id !== drink.id));
+                                             setSelectedDrinks(selectedDrinks.filter((item: any, i: number) => item.id !== drink.id));
                                           }}
                                        />
                                        <span>{drink.name}</span>
@@ -190,13 +190,13 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
                                           value={drink.total_qty}
                                           onChange={(e) => {
                                              const newQuantity = parseInt(e.target.value, 10);
-                                             setSelectedDrinks(selectedDrinks.map((item, i) => i === index ? { ...item, total_qty: newQuantity } : item));
+                                             setSelectedDrinks(selectedDrinks.map((item: any, i: number) => i === index ? { ...item, total_qty: newQuantity } : item));
                                           }}
                                        />
                                        <span
                                           className="bg-blue-500 text-white px-2 py-1 rounded-md cursor-pointer"
                                           onClick={() => {
-                                             setSelectedDrinks(selectedDrinks.map((item, i) => i === index ? { ...item, total_qty: item.total_qty + 1 } : item));
+                                             setSelectedDrinks(selectedDrinks.map((item: any, i: number) => i === index ? { ...item, total_qty: item.total_qty + 1 } : item));
                                           }}
                                        >
                                           +
@@ -204,7 +204,7 @@ const ChooseDrinkModule = ({ isCombo, form }: { isCombo: boolean, form: UseFormR
                                        <span
                                           className="bg-red-500 text-white px-2 py-1 rounded-md cursor-pointer"
                                           onClick={() => {
-                                             setSelectedDrinks(selectedDrinks.map((item, i) => i === index ? { ...item, total_qty: item.total_qty - 1 } : item));
+                                             setSelectedDrinks(selectedDrinks.map((item: any, i: number) => i === index ? { ...item, total_qty: item.total_qty - 1 } : item));
                                           }}
                                        >
                                           -

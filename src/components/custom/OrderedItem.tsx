@@ -20,7 +20,7 @@ interface orderedStackType {
    timeStamp?: string;
 }
 const OrderedItem = () => {
-   const context = useOrderContext()
+   const context: any = useOrderContext()
 
    // setOrders(selectedProducts)
 
@@ -51,8 +51,10 @@ const OrderedItem = () => {
       // Return null or some fallback UI
       return null;
    }
-   orders = context as orderContextType;
-   const { setOrders } = context as orderContextType;
+
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
 
    let orderedStack: orderedStackType[] = [];
    orders.map((item: any) => {
