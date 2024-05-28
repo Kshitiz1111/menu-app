@@ -17,7 +17,7 @@ import { Button } from "../ui/button";
 
 let orders: any;
 const CartItem = () => {
-   const context = useOrderContext()
+   const context: any = useOrderContext()
    useEffect(() => {
       if (!context) return;
 

@@ -20,7 +20,7 @@ interface orderedStackType {
    timeStamp?: string;
 }
 const OrderedItem = () => {
-   const context = useOrderContext()
+   const context: any = useOrderContext()
 
    // setOrders(selectedProducts)
 

@@ -83,7 +83,7 @@ const DishCard = () => {
       getProducts()
    }, [])
 
-   const context = useOrderContext()
+   const context: any = useOrderContext()
 
 
    const handleSelect = async (dish: any) => {
