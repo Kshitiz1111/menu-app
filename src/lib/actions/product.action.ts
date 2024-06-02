@@ -1,13 +1,14 @@
 "use server";
-import pool from "@/lib/database/db";
+// import pool from "@/lib/database/db";
+import { db } from '@vercel/postgres';
 import { z } from "zod";
 import { ProductFormSchema } from "../validator";
-import { PoolClient } from "pg";
+// import { PoolClient } from "pg";
 
 export const createProduct = async (
   productData: z.infer<typeof ProductFormSchema>
 ) => {
-  let client = await pool.connect();
+  let client = await db.connect();
 
   const {
     product_category,
@@ -124,7 +125,7 @@ type categoryType = {
   name: string;
   tableName: string;
 };
-const createCategory = async (category: categoryType, client: PoolClient) => {
+const createCategory = async (category: categoryType, client:any) => {
   // Start a transaction
   await client.query("BEGIN");
 
@@ -195,7 +196,7 @@ type baseIngType = {
 };
 const createBaseIngredient = async (
   baseIng: baseIngType[],
-  client: PoolClient
+  client: any
 ) => {
   // Start a transaction
   await client.query("BEGIN");
@@ -245,7 +246,7 @@ const createBaseIngredient = async (
       );
 
       //collect existed ingredient id into an array
-      exists.rows.forEach(row => {
+      exists.rows.forEach((row:any) => {
         existIngArrIds.push(row.id)
       });
 
@@ -271,7 +272,7 @@ const createBaseIngredient = async (
       
       // Assuming you want to return the IDs of the inserted ingredients
       await client.query("COMMIT");
-      let insertedIngIds = result.rows.map((row) => row.id);
+      let insertedIngIds = result.rows.map((row:any) => row.id);
       return {
         success: true,
         message: "Base ingredients successfully created.",
@@ -303,7 +304,7 @@ type customIngType = {
 };
 const createCustomIngredient = async (
   customIng: customIngType[],
-  client: PoolClient
+  client: any
 ) => {
   // Start a transaction
   await client.query("BEGIN");
@@ -353,7 +354,7 @@ const createCustomIngredient = async (
       );
 
       //collect existed ingredient id into an array
-      exists.rows.forEach(row => {
+      exists.rows.forEach((row:any) => {
         existIngArrIds.push(row.id)
       });
 
@@ -379,7 +380,7 @@ const createCustomIngredient = async (
       
       // Assuming you want to return the IDs of the inserted ingredients
       await client.query("COMMIT");
-      let insertedIngIds = result.rows.map((row) => row.id);
+      let insertedIngIds = result.rows.map((row:any) => row.id);
 
       return {
         success: true,
@@ -406,7 +407,7 @@ const createCustomIngredient = async (
 
 const createComboDessert = async(
   productData: z.infer<typeof ProductFormSchema>,
-  client: PoolClient
+  client: any
 )=>{
 
   const{ product_name, product_des, combo_desserts} = productData;
@@ -514,7 +515,7 @@ const createComboDessert = async(
 
 const createComboDrinks = async(
     productData: z.infer<typeof ProductFormSchema>,
-    client: PoolClient
+    client:any
 )=>{
 
   const{ product_name, product_des, combo_drinks} = productData;
@@ -636,7 +637,7 @@ const postProduct = async(
     comboDessertId?:number
   }
   ,
-  client: PoolClient)=>{
+  client: any)=>{
   // Start a transaction
   
   await client.query("BEGIN");
@@ -760,7 +761,7 @@ export const getSingleProduct = async(product:any)=>{
 }
 
 export const getAllProduct = async () => {
-  let client = await pool.connect();
+  let client = await db.connect();
   // Start a transaction
  await client.query("BEGIN");
 
@@ -824,7 +825,7 @@ export const getAllProduct = async () => {
 
 
 export const getAllDrinks = async()=>{
-  let client = await pool.connect();
+  let client = await db.connect();
   try {
     // SQL query to fetch drinks along with their base ingredients aggregated into a JSON array
     const query = `
@@ -885,7 +886,7 @@ export const getAllDrinks = async()=>{
 
 
 export const getAllDesserts = async()=>{
-  let client = await pool.connect();
+  let client = await db.connect();
   try {
     // SQL query to fetch drinks along with their base ingredients aggregated into a JSON array
     const query = `
@@ -946,7 +947,7 @@ export const getAllDesserts = async()=>{
 
 const getBaseIngredientByIds = async(ids:Array<number>)=>{
   // if(ids.length>0){
-    let client = await pool.connect();
+    let client = await db.connect();
     // Start a transaction
     await client.query("BEGIN");
 
@@ -998,7 +999,7 @@ const getBaseIngredientByIds = async(ids:Array<number>)=>{
 } 
 const getCustomIngredientByIds = async(ids:Array<number>)=>{
   // if(ids.length>0){
-    let client = await pool.connect();
+    let client = await db.connect();
     // Start a transaction
     await client.query("BEGIN");
 
@@ -1051,7 +1052,7 @@ const getCustomIngredientByIds = async(ids:Array<number>)=>{
 }
 const getComboDrinksById = async(id:number)=>{
   // if(id){
-    let client = await pool.connect();
+    let client = await db.connect();
       const query = `
         SELECT 
             cd.*, 
@@ -1121,7 +1122,7 @@ const getComboDrinksById = async(id:number)=>{
 } 
 const getComboDessertsById = async (id:number)=>{
   console.log("dessertid",id)
-      let client = await pool.connect();
+      let client = await db.connect();
       const query = ` 
         SELECT 
           cd.*, 
@@ -1190,7 +1191,7 @@ const getComboDessertsById = async (id:number)=>{
 
 
 //...........update............
-const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], client: PoolClient) => {
+const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], client: any) => {
   try {
      // Start a transaction
      await client.query('BEGIN');
@@ -1268,7 +1269,7 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
   }
  };
 
- const updateOrInsertCustomIngredient = async (productId:any, ingredients: any[], client: PoolClient) => {
+ const updateOrInsertCustomIngredient = async (productId:any, ingredients: any[], client: any) => {
   try {
      // Start a transaction
      await client.query('BEGIN');
@@ -1353,7 +1354,7 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
  };
 
 
- const updateOrInsertComboDrinks = async (comboDrinks: any[], comboDrinksId: number, client: PoolClient) => {
+ const updateOrInsertComboDrinks = async (comboDrinks: any[], comboDrinksId: number, client: any) => {
   try {
      // Start a transaction
      await client.query('BEGIN');
@@ -1364,11 +1365,11 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
          `SELECT drink_id FROM combo_drink_details WHERE combo_drink_id = $1`,
          [comboDrinksId]
        );
-       const comboDrinkDetailsIds = comboDrinkDetailsResult.rows.map(row => row.drink_id);
+       const comboDrinkDetailsIds = comboDrinkDetailsResult.rows.map((row:any) => row.drink_id);
  
        // Compare and remove unmatched drinks
        const providedDrinkIds = comboDrinks.map(comboDrink => comboDrink.id);
-       const unmatchedDrinkIds = comboDrinkDetailsIds.filter(id => !providedDrinkIds.includes(id));
+       const unmatchedDrinkIds = comboDrinkDetailsIds.filter((id:any) => !providedDrinkIds.includes(id));
  
        // Remove unmatched drinks from the combo_drink_details table
        for (const id of unmatchedDrinkIds) {
@@ -1428,7 +1429,7 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
   }
  };
 
- const updateOrInsertComboDesserts = async (comboDesserts: any[], comboDessertsId: number, client: PoolClient) => {
+ const updateOrInsertComboDesserts = async (comboDesserts: any[], comboDessertsId: number, client: any) => {
   try {
      // Start a transaction
      await client.query('BEGIN');
@@ -1439,11 +1440,11 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
          `SELECT dessert_id FROM combo_dessert_details WHERE combo_dessert_id = $1`,
          [comboDessertsId]
        );
-       const comboDessertDetailsIds = comboDessertDetailsResult.rows.map(row => row.dessert_id);
+       const comboDessertDetailsIds = comboDessertDetailsResult.rows.map((row:any) => row.dessert_id);
  
        // Compare and remove unmatched desserts
        const providedDessertIds = comboDesserts.map(comboDessert => comboDessert.id);
-       const unmatchedDessertIds = comboDessertDetailsIds.filter(id => !providedDessertIds.includes(id));
+       const unmatchedDessertIds = comboDessertDetailsIds.filter((id:any) => !providedDessertIds.includes(id));
  
        // Remove unmatched desserts from the combo_dessert_details table
        for (const id of unmatchedDessertIds) {
@@ -1503,7 +1504,7 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
 
 
  export const updateProduct = async (product: any) => {
-  let client = await pool.connect();
+  let client = await db.connect();
   
   try {
     let {product_name, product_img, product_des, product_price, base_ingredient, custom_ingredient, combo_drinks, combo_desserts, product_id}=product;
@@ -1563,7 +1564,7 @@ const updateOrInsertBaseIngredient = async (productId:any,ingredients: any[], cl
 
 
 export const deleteProduct = async(productId:string)=>{
-  let client = await pool.connect();
+  let client = await db.connect();
   await client.query('BEGIN');
   try {
     const baseIngredientIdsResult = await client.query(

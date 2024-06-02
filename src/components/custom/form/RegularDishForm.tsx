@@ -112,7 +112,7 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
                      <FormControl>
                         <div className="flex flex-col flex-wrap gap-4">
                            {baseFields.map((field: any, index: any) => (
-                              <div className='relative mt-1'>
+                              <div key={index} className='relative mt-1'>
                                  <div className='gap-1'>
                                     {(baseFields.length !== 0 && baseFields.length - 1 !== index) ?
                                        <div key={field.id} className="flex items-center px-1">
@@ -211,7 +211,7 @@ const RegularDishForm = ({ form, hideCustom, baseFields, appendBase, removeBase,
                            <div className="flex flex-col flex-wrap gap-4">
                               <FormDescription>enter price for 1 unit(eg: name=onion qty=1 unit=slice price=2)  </FormDescription>
                               {customFields.map((field: any, index: any) => (
-                                 <div className='flex flex-wrap items-center justify-center'>
+                                 <div key={index} className='flex flex-wrap items-center justify-center'>
 
                                     <div key={field.id} className="flex items-center gap-1">
                                        {(customFields.length !== 0 && customFields.length - 1 !== index) ?
