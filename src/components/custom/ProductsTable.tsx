@@ -15,6 +15,7 @@ import {
    AlertDialogTitle,
    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useRouter } from "next/navigation";
 
 
 interface Product {
@@ -33,6 +34,8 @@ interface Product {
 }
 const ProductTable = () => {
    const [products, setProducts] = useState<Array<Product>>();
+   const router = useRouter();
+
    async function getProducts() {
       try {
          let response = await fetch("/api/product", {
@@ -58,13 +61,15 @@ const ProductTable = () => {
       return null;
    }
 
-   const { setToBeEditedProduct } = context;
+   const { setToBeEditedProduct, toBeEditedProduct } = context;
    const handleEdit = async (product: any) => {
       console.log("to be edited product", product);
       let result = await getSingleProduct(product);
       console.log("hello", result.product)
       setToBeEditedProduct({ product: JSON.stringify(result.product), productRawData: JSON.stringify(product) })
+      router.push(`/admin/updateproduct/${product.product_id}`);
    }
+
 
    const handleDelete = async (product_id: number) => {
       console.log(product_id)
@@ -124,7 +129,7 @@ const ProductTable = () => {
                         <td className="border p-1">{product.product_name}</td>
                         <td className="border p-1">{product.product_des.substring(0, 20)}...</td>
                         <td className="border p-1 flex justify-evenly">
-                           <Link href={`/admin/updateproduct/${product.product_id}`} ><button onClick={() => handleEdit(product)} className="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded mr-2">Edit</button></Link>
+                           <button onClick={() => handleEdit(product)} className="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded mr-2">Edit</button>
                            <AlertDialog>
                               <AlertDialogTrigger className="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Delete</AlertDialogTrigger>
                               <AlertDialogContent>

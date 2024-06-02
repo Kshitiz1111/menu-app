@@ -25,6 +25,12 @@ import {
    TooltipProvider,
    TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+   Accordion,
+   AccordionContent,
+   AccordionItem,
+   AccordionTrigger,
+} from "@/components/ui/accordion"
 import { useOrderContext } from "@/context/orderContext"
 import { getSingleProduct } from "@/lib/actions/product.action"
 import Image from "next/image"
@@ -34,7 +40,7 @@ import { ProductFormSchema } from "@/lib/validator"
 import { z } from "zod"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
-import type { orderContextType } from "@/context/orderContext"
+// import type { orderContextType } from "@/context/orderContext"
 
 interface Product {
    baseing_ids: number[] | null;
@@ -77,35 +83,47 @@ const DishCard = () => {
       getProducts()
    }, [])
 
-   const context = useOrderContext()
-   if (!context) {
-      // Return null or some fallback UI
-      return null;
-   }
-   const { setOrders, orders } = context as orderContextType;
+   const context: any = useOrderContext()
+
 
    const handleSelect = async (dish: any) => {
       try {
-         let result = await getSingleProduct(dish);
-         // setSingleProduct(result.product)
+         let result: any = await getSingleProduct(dish);
          setSingleProduct({
             ...result.product,
+            custom_ingredient: (result.product?.custom_ingredient && result.product.custom_ingredient.length > 0) ? result.product.custom_ingredient.map((customIngredient: any) => {
+               const matchingBaseIngredient = result.product.base_ingredient?.find(
+                  (baseIngredient: any) => baseIngredient.ing_name === customIngredient.ing_name
+               );
+               if (matchingBaseIngredient) {
+                  return {
+                     ...customIngredient,
+                     ing_qty: Number(matchingBaseIngredient.ing_qty),
+                  };
+               } else {
+                  return customIngredient;
+               }
+            }) : "",
             total_quantity: 1,
             total_price: 1 * Number(result.product?.product_price),
          });
-         // setSingleDish(JSON.stringify(result.product));
+         console.log("singleProduct", result.product);
          // console.log('customer context product', JSON.parse(product))
       } catch (error) {
          console.log(error)
       }
    }
+   let orders: any;
 
    useEffect(() => {
       // Serialize the orders array to a JSON string
+      if (!context) return;
+
+      const { orders, setOrders } = context as any;
       function generateGuestId() {
          return '_' + Math.random().toString(36).substring(2, 9);
       }
-
+      console.log("orders", orders)
       // Check if a guest ID already exists
       let guestId = localStorage.getItem('guestId');
       if (!guestId) {
@@ -125,6 +143,13 @@ const DishCard = () => {
 
    }, [orders])
 
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
    return (
       <div className="flex flex-wrap gap-1">
          {(products && products.length > 0) ?
@@ -168,8 +193,8 @@ const DishCard = () => {
                                        {
                                           singleProduct.base_ingredient && singleProduct.base_ingredient?.length > 0 &&
 
-                                          singleProduct.base_ingredient.map((baseing: any) => (
-                                             <span className={'text-gray-500 font-semibold text-sm'}>{baseing.ing_name} ,</span>
+                                          singleProduct.base_ingredient.map((baseing: any, index: number) => (
+                                             <span key={index} className={'text-gray-500 font-semibold text-sm'}>{baseing.ing_name} ,</span>
                                           ))
                                        }
                                     </div>
@@ -184,7 +209,7 @@ const DishCard = () => {
                                           singleProduct.custom_ingredient && singleProduct.custom_ingredient?.length > 0 &&
 
                                           singleProduct.custom_ingredient.map((customing: any, index: number) => (
-                                             <div className="flex flex-wrap justify-between items-center mb-1">
+                                             <div key={index} className="flex flex-wrap justify-between items-center mb-1">
                                                 <span className="text-gray-500 font-semibold text-sm">{customing.ing_name}</span>
                                                 <div className="flex gap-1">
                                                    <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
@@ -197,11 +222,16 @@ const DishCard = () => {
                                                          if (temp === 0) return;
 
                                                          temp--;
-                                                         updatedIngredients[index].ing_qty = temp.toString(); // Increment the quantity
+                                                         updatedIngredients[index].ing_qty = temp.toString(); // decrement the quantity
 
+                                                         // Calculate the new total price using the current quantity
+                                                         // const newTotalPrice = singleProduct.total_price + updatedIngredients.reduce((acc, curr) => acc + (curr.ing_qty * curr.ing_price), 0);
+                                                         // console.log(singleProduct.total_price, "newTotalPrice", newTotalPrice)
+                                                         console.log("newPrice", Number(singleProduct.total_price) + (Number(customing.ing_price) * Number(customing.ing_qty)))
                                                          setSingleProduct({
                                                             ...singleProduct,
                                                             custom_ingredient: updatedIngredients,
+                                                            total_price: Number(singleProduct.total_price) - (Number(customing.ing_price) * Number(customing.ing_qty)),
                                                          });
                                                       }}
                                                    >-</button>
@@ -209,6 +239,7 @@ const DishCard = () => {
                                                       type="number"
                                                       value={customing.ing_qty}
                                                       min={0}
+                                                      max={1000}
                                                       className="text-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4"
                                                       readOnly
                                                    />
@@ -222,9 +253,15 @@ const DishCard = () => {
                                                          temp++;
                                                          updatedIngredients[index].ing_qty = temp.toString(); // Increment the quantity
 
+                                                         // Calculate the new total price by adding the ingredient's price once
+                                                         // const newTotalPrice = singleProduct.total_price + updatedIngredients.reduce((acc, curr) => acc + (curr.ing_price), 0);
+                                                         // console.log(singleProduct.total_price, "newTotalPrice", newTotalPrice)
+                                                         console.log("newPrice", Number(singleProduct.total_price) + (Number(customing.ing_price) * Number(customing.ing_qty)))
+                                                         let tempQty = 0;
                                                          setSingleProduct({
                                                             ...singleProduct,
                                                             custom_ingredient: updatedIngredients,
+                                                            total_price: (Number(singleProduct.total_price) + (Number(customing.ing_price) * ++tempQty)).toFixed(2),
                                                          });
                                                       }}
                                                    >+</button>
@@ -244,12 +281,41 @@ const DishCard = () => {
                                     <div className="">
                                        {
                                           singleProduct.combo_drinks && singleProduct.combo_drinks?.length > 0 &&
-                                          singleProduct.combo_drinks.map((drink: any) => (
-                                             <div className="flex items-center gap-1 m-1">
-                                                <span className="text-sm bg-black rounded-full px-2 text-white">{drink.total_qty}</span>
-                                                <span className="text-gray text-md mr-2"> - {drink.name}</span>
-                                             </div>
-                                          ))
+                                          <Accordion type="single" collapsible>
+                                             <ul className="px-1">
+                                                <AccordionItem value="item-1" className="border-0">
+                                                   <AccordionTrigger className='py-0 text-xs justify-normal flex flex-wrap gap-1'>
+                                                      {
+                                                         singleProduct.combo_drinks.map((drink: any, index: number) => (
+                                                            <div key={index} className="flex items-center gap-1">
+                                                               <span className="text-sm bg-black rounded-full px-2 text-white">{drink.total_qty}</span>
+                                                               <span className="text-gray text-md mr-2"> {drink.name}</span>
+                                                            </div>
+                                                         ))
+                                                      }
+                                                   </AccordionTrigger>
+                                                   <AccordionContent className="pb-0 px-2">
+                                                      {
+                                                         singleProduct.combo_drinks.map((drink: any, i: number) => (
+                                                            <div key={i} className="flex text-xs">
+                                                               <span className="font-semibold">{++i}. </span>
+                                                               <li className="mr-1 mb-1">
+                                                                  <span className="mr-1">name: {drink.name},</span>
+                                                                  <span>ingredients:
+                                                                     {(drink.base_ingredient && drink.base_ingredient.length > 0) &&
+                                                                        drink.base_ingredient.map((ing: any, index: number) => (
+                                                                           <span key={index}> {ing.ing_name}, </span>
+                                                                        ))
+                                                                     }
+                                                                  </span>
+                                                               </li>
+                                                            </div>
+                                                         ))
+                                                      }
+                                                   </AccordionContent>
+                                                </AccordionItem>
+                                             </ul>
+                                          </Accordion>
                                        }
                                     </div>
                                  </div>
@@ -261,8 +327,8 @@ const DishCard = () => {
                                     <div className="">
                                        {
                                           singleProduct.combo_desserts && singleProduct.combo_desserts?.length > 0 &&
-                                          singleProduct.combo_desserts.map((dessert: any) => (
-                                             <div className="flex items-center gap-1 m-1">
+                                          singleProduct.combo_desserts.map((dessert: any, index: number) => (
+                                             <div key={index} className="flex items-center gap-1 m-1">
                                                 <span className="text-sm bg-black rounded-full px-2 text-white">{dessert.total_qty}</span>
                                                 <span className="text-gray text-md mr-2"> - {dessert.name}</span>
                                              </div>

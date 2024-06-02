@@ -15,26 +15,13 @@ import type { orderContextType } from "@/context/orderContext"
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 
-
+let orders: any;
 const CartItem = () => {
-   const context = useOrderContext()
-   if (!context) {
-      // Return null or some fallback UI
-      return null;
-   }
-   const { setOrders, orders } = context as orderContextType;
-   // setOrders(selectedProducts)
-
-   const updateQuantity = (id: any, quantity: any) => {
-      setOrders(orders.map(item => item.product_id == id ? { ...item, total_quantity: quantity, total_price: Math.ceil(Number(item.product_price)) * Number(quantity) } : item));
-   };
-
-   const removeItem = (id: any) => {
-      setOrders(orders.filter(item => item.product_id !== id));
-   };
-   // console.log("orders cart", orders)
-
+   const context: any = useOrderContext()
    useEffect(() => {
+      if (!context) return;
+
+      const { orders, setOrders } = context as any;
       // Check if a guest ID already exists
       let guestId = localStorage.getItem('guestId');
 
@@ -47,14 +34,33 @@ const CartItem = () => {
       localStorage.setItem('orders', ordersString);
       // console.log("totalOrder after edit from cart", ordersWithUserId,);
       console.log("hello")
-   }, [orders])
+   }, [orders]);
+
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
+   // setOrders(selectedProducts)
+
+   const updateQuantity = (id: any, quantity: any) => {
+      setOrders(orders.map((item: any) => item.product_id == id ? { ...item, total_quantity: quantity, total_price: (Number(item.product_price) * Number(quantity)).toFixed(2) } : item));
+   };
+
+   const removeItem = (id: any) => {
+      setOrders(orders.filter((item: any) => item.product_id !== id));
+   };
+   // console.log("orders cart", orders)
    return (
       <div className=" overflow-y-scroll h-screen">
          {orders &&
-            orders.map((item: z.infer<typeof ProductFormSchema>) => {
+            orders.map((item: z.infer<typeof ProductFormSchema>, index: number) => {
 
                return (
-                  <div>
+                  <div key={index}>
                      {(!item.purchase_confirm) ?
                         <div className="relative p-4 bg-white shadow-md rounded-lg mb-4">
                            <Image
@@ -68,7 +74,7 @@ const CartItem = () => {
                            <div className="cart-item flex flex-wrap items-center justify-between">
                               <div className="">
                                  <h4 className="text-lg font-semibold text-gray-800">{item.product_name}</h4>
-                                 <p className="absolute top-0 right-0 py-0 px-2 text-gray-500 text-sm text-gray-500">${Math.ceil(Number(item.total_price))}</p>
+                                 <p className="absolute top-0 right-0 py-0 px-2 text-gray-500 text-sm text-gray-500">${Number(item.total_price)}</p>
                               </div>
                               <div className="flex items-center w-full gap-1">
                                  <button
@@ -97,8 +103,8 @@ const CartItem = () => {
                                                 <span className="font-semibold">base ingredients</span>
                                                 <div className="flex flex-wrap px-1">
                                                    {
-                                                      item.base_ingredient.map((ing) => (
-                                                         <span className="mr-1">{ing.ing_name},</span>
+                                                      item.base_ingredient.map((ing, index: number) => (
+                                                         <span key={index} className="mr-1">{ing.ing_name},</span>
                                                       ))
                                                    }
 
@@ -113,8 +119,8 @@ const CartItem = () => {
                                                 <span className="font-semibold">custom ingredients</span>
                                                 <div className="flex flex-wrap px-1">
                                                    {
-                                                      item.custom_ingredient.map((ing, i) => (
-                                                         <div className="flex">
+                                                      item.custom_ingredient.map((ing, i: number) => (
+                                                         <div className="flex" key={i}>
                                                             <span className="font-semibold">{++i}. </span>
                                                             <span className={`${Number(ing.ing_qty) === 0 ? 'line-through' : ''} mr-1`} >
                                                                {ing.ing_name}
@@ -139,8 +145,8 @@ const CartItem = () => {
                                                    <span className="font-semibold">combo drinks</span>
                                                    <ul className="px-1">
                                                       {
-                                                         item.combo_drinks.map((drink, i) => (
-                                                            <div className="flex">
+                                                         item.combo_drinks.map((drink, i: number) => (
+                                                            <div className="flex" key={i}>
                                                                <span className="font-semibold">{++i}. </span>
                                                                <li className="mr-1 mb-1">
                                                                   <span className="mr-1">name: {drink.name},</span>
@@ -165,8 +171,8 @@ const CartItem = () => {
                                                    <span className="font-semibold">combo dessert</span>
                                                    <ul className="px-1">
                                                       {
-                                                         item.combo_desserts.map((dessert, i) => (
-                                                            <div className="flex">
+                                                         item.combo_desserts.map((dessert, i: number) => (
+                                                            <div className="flex" key={i}>
                                                                <span className="font-semibold">{++i}. </span>
                                                                <li className="mr-1 mb-1">
                                                                   <span className="mr-1">name: {dessert.name},</span>

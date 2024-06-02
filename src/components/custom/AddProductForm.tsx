@@ -287,7 +287,6 @@ const AddProductForm = () => {
                                     removeBase={removeBase}
                                  />
                                     : ""
-
                      }
 
                      <Button type="submit" disabled={!form.formState.isValid}>Submit</Button>

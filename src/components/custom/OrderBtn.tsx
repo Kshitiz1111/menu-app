@@ -14,17 +14,12 @@ const OrderBtn = () => {
    const vatPercentage = 0.13;
    const tempOrderId = generateUniquePurchaseOrderId();
 
-   const context = useOrderContext()
-   if (!context) {
-      // Return null or some fallback UI
-      return null;
-   }
-   const { orders, setOrders } = context as orderContextType;
-
+   const context: any = useOrderContext()
+   let orders: any;
    useEffect(() => {
       let price = 0;
       let itemsLength = 0;
-      orders.map((item) => {
+      orders.map((item: any) => {
          if (!item.purchase_confirm) {
             price += Number(item.total_price);
             itemsLength++;
@@ -33,6 +28,15 @@ const OrderBtn = () => {
       setTotalItem(itemsLength);
       setTotalPrice(price);
    }, [orders])
+   if (!context) {
+      // Return null or some fallback UI
+      return null;
+   }
+
+   orders = context.orders as any;
+   console.log("orders", orders)
+   const { setOrders } = context as any;
+
 
    function generateUniquePurchaseOrderId() {
       // Get the current timestamp
@@ -96,7 +100,7 @@ const OrderBtn = () => {
                console.log("khalti initial payment success: ", data);
                let guestId = localStorage.getItem('guestId');
 
-               setOrders(orders.map((item) => {
+               setOrders(orders.map((item: any) => {
                   // Check if item.purchase_confirm is false or undefined
                   if (item.purchase_confirm === false || item.purchase_confirm === undefined) {
                      // If the condition is met, return a new object with the modified purchase_order_id
