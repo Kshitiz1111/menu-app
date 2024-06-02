@@ -1,20 +1,13 @@
-import pool from "@/lib/database/db";
+// import pool from "@/lib/database/db";
+import { db } from '@vercel/postgres';
 import { OrderType } from "@/types/orders";
-import { PoolClient } from "pg";
+// import { PoolClient } from "pg";
 
 export const saveOrders = async(order:any)=>{
-   let client:PoolClient = await pool.connect();
+   let client = await db.connect();
    console.log("order from saveorders action", order);
    try {
-      const checkOrderExists = await client.query(
-         `SELECT 1 FROM orders WHERE purchase_order_id = $1 LIMIT 1;`,
-         [order.purchase_order_id]
-      );
-      if (checkOrderExists.rows.length > 0) {
-         console.error("Order with this purchase_order_id already exists.");
-         client.release();
-         return { success: false, message: "Order with this purchase_order_id already exists." };
-      }
+      
       await client.query("BEGIN");
       // Check and create 'orders' table if not exists
       await client.query(`
@@ -37,15 +30,31 @@ export const saveOrders = async(order:any)=>{
             END IF;
          END $$;
       `);
-   
+      await client.query("COMMIT");
+
+      //check if particular order already exist to avoide redundand data
+      await client.query("BEGIN")
+      const checkOrderExists = await client.query(
+         `SELECT 1 FROM orders WHERE purchase_order_id = $1 LIMIT 1;`,
+         [order.purchase_order_id]
+      );
+      if (checkOrderExists.rows.length > 0) {
+         console.error("Order with this purchase_order_id already exists.");
+         client.release();
+         return { success: false, message: "Order with this purchase_order_id already exists." };
+      }
+      
       // Insert order into 'orders' table
       const result:any = await client.query(
          `INSERT INTO orders (purchase_order_id, no_of_item, total_price, compensation, status) 
          VALUES ($1, $2, $3, $4, $5) RETURNING order_id;`,
          [order.purchase_order_id, order.no_of_item, order.total_price, order.compensation??null, order.status]
       );
+      await client.query("COMMIT")
+      
 
       // Check and create 'order_details' table if not exists
+      await client.query("BEGIN");
       await client.query(`
          DO $$
          BEGIN

@@ -27,12 +27,12 @@ import { useEditProductContext } from '@/context/editProductContext'
 const UpdateProductForm = () => {
 
    const context = useEditProductContext();
-   let toBeEditedProduct: any;
-   console.log(toBeEditedProduct)
+   let toBeEditedProduct: any = context?.toBeEditedProduct;
+
    // 1. Define your form.
-   const form = useForm<z.infer<typeof ProductFormSchema>>({
+   let form = useForm<z.infer<typeof ProductFormSchema>>({
       resolver: zodResolver(ProductFormSchema),
-      defaultValues: JSON.parse(toBeEditedProduct?.product)
+      defaultValues: JSON.parse(toBeEditedProduct.product)
    })
 
    const { fields: baseFields, append: appendBase, remove: removeBase } = useFieldArray({
@@ -43,6 +43,7 @@ const UpdateProductForm = () => {
       control: form.control,
       name: 'custom_ingredient',
    });
+
    if (!context) {
       // Return null or some fallback UI
       return null;
