@@ -65,7 +65,6 @@ const ProductTable = () => {
    const handleEdit = async (product: any) => {
       console.log("to be edited product", product);
       let result = await getSingleProduct(product);
-      console.log("hello", result.product)
       setToBeEditedProduct({ product: JSON.stringify(result.product), productRawData: JSON.stringify(product) })
       router.push(`/admin/updateproduct/${product.product_id}`);
    }

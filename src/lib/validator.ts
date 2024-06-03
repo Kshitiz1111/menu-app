@@ -1,6 +1,9 @@
 import { object, z } from "zod"
 
-
+export const AdminLoginType = z.object({
+   email: z.string().email(),
+   password: z.string()
+})
 
 export const ProductFormSchema = z.object({
    product_id:z.optional(z.number().or(z.string())),
