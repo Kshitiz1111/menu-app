@@ -4,11 +4,13 @@ export const khaltiPay = async(payload:PaymentPayload)=>{
    try {
       let response = await fetch("https://a.khalti.com/api/v2/epayment/initiate/", {
          method: "POST",
+         credentials: 'include',
          headers: {
             "Authorization": `key faec6057a16449a6ae2866e07b2935f6`,
             "Content-Type": "application/json"
          },
-         body: JSON.stringify(payload)
+         body: JSON.stringify(payload),
+
       })
        // Handle the response data as needed
        return response;
