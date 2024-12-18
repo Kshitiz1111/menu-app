@@ -1,11 +1,14 @@
 import { PaymentPayload } from "../validator";
 import axios from "axios"
 
+
+
 export const khaltiPay = async(payload:PaymentPayload)=>{
    try {
 
-      let response = await axios.post("https://a.khalti.com/api/v2/epayment/initiate/",
-         
+      
+      let response = await axios.post("/api/k_payment",
+      // let response = await axios.post("https://a.khalti.com/api/v2/epayment/initiate/",
             payload
          ,
          {
