@@ -16,6 +16,7 @@ export const khaltiPay = async(payload:PaymentPayload)=>{
             "Content-Type": "application/json"
          },
          withCredentials: true,
+         
        
       })
       // let response = await fetch("https://a.khalti.com/api/v2/epayment/initiate/", {
