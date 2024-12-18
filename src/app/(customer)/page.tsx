@@ -8,7 +8,7 @@ import type { orderContextType } from "@/context/orderContext"
 import { useEffect, useRef, useState } from "react"
 import { paymentVerificationLookup } from "@/lib/actions/payment.action"
 import { OrderType } from "@/types/orders"
-
+import { restaurant_id } from "@/lib/placeHolderData"
 
 interface TransactionDetails {
    pidx: string;
@@ -41,8 +41,10 @@ const CustomerPage = () => {
    let [toastInfo, setToastInfo] = useState<toastInfoType | undefined>(undefined);
    const context = useOrderContext()
 
+   console.log("searchParams", searchParams?.get("restaurant_id"))
 
    // Display the key/value pairs
+   let res
    const entities = searchParams?.entries();
 
    useEffect(() => {
@@ -170,7 +172,7 @@ const CustomerPage = () => {
                   (async () => {
                      try {
                         // Create the fetch request
-                        const response = await fetch('http://localhost:3000/api/orders', {
+                        const response = await fetch('http://localhost:3000/api/customer/orders', {
                            method: 'POST', // Specify the method
                            headers: {
                               'Content-Type': 'application/json', // Set the content type header
@@ -205,7 +207,7 @@ const CustomerPage = () => {
             };
 
             const ordersString = JSON.stringify(ordersWithUserId);
-            localStorage.setItem('orders', ordersString);
+            localStorage.setItem(`${restaurant_id}_orders`, ordersString);
             console.log("totalOrder after edit from cart", ordersWithUserId,);
             // Mark the effect as having run
             hasRun.current = true;

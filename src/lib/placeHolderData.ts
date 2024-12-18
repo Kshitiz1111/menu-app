@@ -1,3 +1,5 @@
+export const restaurant_id = 'r01'
+
 export const drinksPlaceholder = [
    {
 

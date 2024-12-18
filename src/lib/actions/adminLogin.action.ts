@@ -3,8 +3,9 @@ import { db } from '@vercel/postgres';
 import { z } from 'zod';
 import { AdminLoginType } from '../validator';
 import * as argon2 from "argon2";
+import { cookies } from 'next/headers';
 
-export const adminLogin =  async ({email, password}:z.infer<typeof AdminLoginType>)=>{
+export const adminLogin = async ({email, password}:{email:string, password: string})=>{
    const rClient = await db.connect();//r in client means reference to the restaurant database, not the main database
 
    try {

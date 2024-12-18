@@ -9,29 +9,29 @@ import cookie from "cookie"
 
 export default async function handler(req:NextApiRequest, res:NextApiResponse){
    const reqObj:z.infer<typeof AdminLoginType> = req.body;
-
+   
    try {
       if(req.method === 'POST'){
          // console.log(reqObj,"asdf");
-         let result:any = await adminLogin(reqObj);
+         let result:any = await adminLogin({email:reqObj.email, password: reqObj.password});
          // console.log('asdf')
          if(!result.success){
             throw new Error(`${result.error}`);
          }
+         let jwtExpiretime: string = (reqObj.remember)? '5m':'1m';
          const token = await new SignJWT({})
          .setProtectedHeader({alg: 'HS256'})
          .setJti(nanoid())
          .setIssuedAt()
-         .setExpirationTime('1m')
+         .setExpirationTime(jwtExpiretime)
          .sign(new TextEncoder().encode(getAdminJwtSecretKey()))
-
+         
          res.setHeader('Set-Cookie', cookie.serialize('admin_auth_tkn', token,{
             httpOnly: true,
             path: '/',
             secure: process.env.NODE_ENV === 'production'
          }));
          res.status(200).json({success: result.success, identity_code: result.restauranIdentityCode, error: ""});
-         
       }
       if(req.method === 'GET'){
          

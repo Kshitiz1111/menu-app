@@ -1,9 +1,13 @@
 'use client'
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import React, { useState, FormEvent } from 'react';
 
 const AdminLoginForm = () => {
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
+   const [remember, setRemember] = useState(false);
    const [errorString, setErrorString] = useState('');
    const [isLoading, setIsLoading] = useState(false);
 
@@ -11,7 +15,7 @@ const AdminLoginForm = () => {
       event.preventDefault();
       setIsLoading(true);
 
-      const data = { email, password };
+      const data = { email, password, remember };
       try {
          const response = await fetch('http://localhost:3000/api/admin_auth', {
             method: 'POST',
@@ -27,9 +31,15 @@ const AdminLoginForm = () => {
             throw new Error('Network response was not ok');
          }
 
+         const cookieRes = await fetch('http://localhost:3000/api/cookie_management', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ restaurant_id: responseData.identity_code }),
+         });
          // if (!responseData.success)
-         console.log(responseData); // Handle the response data as needed
-
+         console.log('login success'); // Handle the response data as needed
       } catch (error) {
          console.error('There was a problem with the fetch operation:', error);
       } finally {
@@ -40,11 +50,11 @@ const AdminLoginForm = () => {
    return (
       <div className=''>
          <p className='text-center'>admin login</p>
-         <div className='w-1/2 m-auto'>
+         <div className='w-1/2 m-auto bg-gray-200 p-4 rounded-md'>
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
                <div className="mb-4">
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                  <input
+                  <Input
                      type="email"
                      placeholder="Enter your email"
                      value={email}
@@ -54,13 +64,19 @@ const AdminLoginForm = () => {
                </div>
                <div className="mb-4">
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                  <input
+                  <Input
                      type="password"
                      placeholder="Enter your password"
                      value={password}
                      onChange={(e) => setPassword(e.target.value)}
                      className="mt-1 block w-full shadow-sm sm:text-gray-900 bg-white border-gray-300 rounded-md"
                   />
+               </div>
+               <div className="mb-4">
+                  <div className="flex items-center space-x-2">
+                     <Checkbox onClick={() => setRemember(!remember)} checked={remember} id="remember" />
+                     <Label htmlFor="remember">remember me</Label>
+                  </div>
                </div>
                <div className="mt-4">
                   <button type="submit" disabled={isLoading} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200">

@@ -6,8 +6,17 @@ export async function middleware(request: NextRequest){
    // console.log("middelware ran: ",adminTkn)
    const verifiedAdminTkn = adminTkn && 
    (await verifyAdminAuth(adminTkn).catch((err:any)=>{
-      console.log(err)
+      console.log(err);
    }))
+
+   // Redirect authenticated admins trying to access the root page to the admin dashboard
+   if(request.nextUrl.pathname === '/' && verifiedAdminTkn){
+      return NextResponse.redirect(new URL('/admin', request.url));
+   }
+
+   if(request.nextUrl.pathname === '/' && !verifiedAdminTkn){
+      return
+   }
 
    if(request.nextUrl.pathname.startsWith('/admin/login') && !verifiedAdminTkn){
       return
@@ -23,5 +32,5 @@ export async function middleware(request: NextRequest){
 } 
 
 export const config={
-   matcher:['/admin/:path*']
+   matcher:['/admin/:path*','/']
 }

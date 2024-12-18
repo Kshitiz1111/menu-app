@@ -2,7 +2,8 @@ import { object, z } from "zod"
 
 export const AdminLoginType = z.object({
    email: z.string().email(),
-   password: z.string()
+   password: z.string(),
+   remember: z.boolean()
 })
 
 export const ProductFormSchema = z.object({
@@ -99,7 +100,6 @@ export const ProductFormSchema = z.object({
          })
       )
    )
-
 })
 
 

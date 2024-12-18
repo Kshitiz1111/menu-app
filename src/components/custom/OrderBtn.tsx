@@ -5,17 +5,18 @@ import type { orderContextType } from "@/context/orderContext"
 import { PaymentPayload } from '@/lib/validator'
 import { khaltiPay } from '@/lib/actions/payment.action'
 import { validateAndSanitizeUrl } from '@/lib/utils'
-
+import { restaurant_id } from '@/lib/placeHolderData'
 
 const OrderBtn = () => {
    const [totalItem, setTotalItem] = useState(0);
    const [totalPrice, setTotalPrice] = useState(0)
-   const guestId: string = JSON.parse(localStorage.getItem("orders")!).userId;
+   const guestId: string = JSON.parse(localStorage.getItem(`${restaurant_id}_orders`)!)?.userId;
    const vatPercentage = 0.13;
    const tempOrderId = generateUniquePurchaseOrderId();
-
    const context: any = useOrderContext()
    let orders: any;
+   orders = context.orders as any;
+   console.log("orders", orders)
    useEffect(() => {
       let price = 0;
       let itemsLength = 0;
@@ -33,8 +34,7 @@ const OrderBtn = () => {
       return null;
    }
 
-   orders = context.orders as any;
-   console.log("orders", orders)
+
    const { setOrders } = context as any;
 
 
@@ -81,7 +81,7 @@ const OrderBtn = () => {
             "unit_price": (totalPrice + Math.ceil(totalPrice * vatPercentage)) * 100,
          }
       ],
-      "merchant_username": "menu app",
+      "merchant_username": restaurant_id + "_restaurant",
       "merchant_extra": "baneshwor branch"
    }
 
@@ -116,7 +116,7 @@ const OrderBtn = () => {
                   userId: guestId, // Use the guest ID for guests
                };
                const ordersString = JSON.stringify(ordersWithUserId);
-               localStorage.setItem('orders', ordersString);
+               localStorage.setItem(`${restaurant_id}_orders`, ordersString);
 
                window.location.href = data.payment_url;
             }

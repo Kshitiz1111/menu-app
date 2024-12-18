@@ -1,12 +1,16 @@
+import RestaurantProfile from '@/components/custom/temp';
+import { cookies } from 'next/headers';
 import Link from 'next/link'
 import React from 'react'
 
-const Dashboard = () => {
+
+const Dashboard = async () => {
+   const restaurant_id = cookies().get("restaurant_id")?.value;
+   console.log("restaurant_id", restaurant_id)
+
    return (
       <div>admin Dashboard
-
-         <Link href={`/admin/updateproduct/${1232}`}><button className="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded mr-2">Edit</button></Link>
-
+         <RestaurantProfile rid={restaurant_id || undefined} />
       </div>
    )
 }
