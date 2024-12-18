@@ -90,7 +90,7 @@ const OrderBtn = () => {
          let response = await khaltiPay(paymentPayload);
          console.log("response", response);
          if (response?.status != 200) {
-            throw new Error("Payment initiation failed", response);
+            throw new Error("Payment initiation failed");
          }
 
          const data = await response?.data;
