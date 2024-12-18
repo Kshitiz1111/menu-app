@@ -93,7 +93,7 @@ const OrderBtn = () => {
             throw new Error("Payment initiation failed");
          }
 
-         const data = await response?.data;
+         const data = response?.data;
          console.log("data", data);
          if (response?.status === 200) {
             // Parse the URL
