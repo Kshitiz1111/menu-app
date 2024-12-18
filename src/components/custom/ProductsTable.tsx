@@ -16,6 +16,7 @@ import {
    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useRouter } from "next/navigation";
+import { getSingleProductByRestaurant } from "@/lib/actions/admin/product.action";
 
 
 interface Product {
@@ -35,14 +36,15 @@ interface Product {
 const ProductTable = () => {
    const [products, setProducts] = useState<Array<Product>>();
    const router = useRouter();
-
+   console.log("products", products)
    async function getProducts() {
       try {
-         let response = await fetch("/api/product", {
+         let response = await fetch("/api/admin/product", {
             method: 'GET', // Specify the method
             headers: {
                'Content-Type': 'application/json' // Set the content type header
             },
+            credentials: 'include'
          })
          let result = await response.json();
          setProducts(result.message.products);
@@ -64,8 +66,7 @@ const ProductTable = () => {
    const { setToBeEditedProduct, toBeEditedProduct } = context;
    const handleEdit = async (product: any) => {
       console.log("to be edited product", product);
-      let result = await getSingleProduct(product);
-      console.log("hello", result.product)
+      let result = await getSingleProductByRestaurant(product, 'r02');
       setToBeEditedProduct({ product: JSON.stringify(result.product), productRawData: JSON.stringify(product) })
       router.push(`/admin/updateproduct/${product.product_id}`);
    }

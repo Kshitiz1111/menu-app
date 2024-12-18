@@ -7,6 +7,7 @@ import { ProductFormSchema } from "../validator";
 
 export const createProduct = async (
   productData: z.infer<typeof ProductFormSchema>
+  
 ) => {
   let client = await db.connect();
 
@@ -822,6 +823,8 @@ export const getAllProduct = async () => {
     };
  }
 };
+
+
 
 
 export const getAllDrinks = async()=>{

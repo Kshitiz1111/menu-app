@@ -14,6 +14,7 @@ import { useOrderContext } from "@/context/orderContext";
 import type { orderContextType } from "@/context/orderContext"
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { restaurant_id } from "@/lib/placeHolderData";
 
 interface orderedStackType {
    orderId: string;
@@ -43,7 +44,7 @@ const OrderedItem = () => {
       };
 
       const ordersString = JSON.stringify(ordersWithUserId);
-      localStorage.setItem('orders', ordersString);
+      localStorage.setItem(`${restaurant_id}_orders`, ordersString);
       // console.log("totalOrder after edit from cart", ordersWithUserId,);
 
    }, [orders])
@@ -257,7 +258,7 @@ const OrderedItem = () => {
 
 
                                  </div>
-                                 : ""}
+                                 : ''}
                            </div>
                         )
                      })

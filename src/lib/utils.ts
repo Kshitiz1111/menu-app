@@ -97,3 +97,7 @@ export function validateAndSanitizeUrl(url:string) {
      return false;
   }
  }
+
+async function streamToJson(stream: ReadableStream<Uint8Array>): Promise<any> {
+  return await new Response(stream).json();
+}

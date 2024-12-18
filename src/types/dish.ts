@@ -55,3 +55,8 @@ interface Drinks{
    price: number,
    qty: number,
 }
+
+export type AdminJwtPayloadType = {
+   jti: string;
+   iat: number;
+}

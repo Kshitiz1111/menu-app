@@ -71,7 +71,7 @@ const AddProductForm = () => {
    // console.log('All form values', allValues);
 
    const handleChange = (categoryName: string, categoryValue: string, field: any) => {
-      // console.log(categoryName, categoryValue);
+      // console.log("hello", categoryName, categoryValue);
       if (categoryName === "product_type") setPType(categoryValue);
       if (categoryName === "product_category") setPCategory(categoryValue);
       if (categoryName === "diet_type") setPDiet(categoryValue);
@@ -87,11 +87,12 @@ const AddProductForm = () => {
       }));
 
       try {
-         let response = await fetch("/api/product", {
+         let response = await fetch("/api/admin/product", {
             method: 'POST', // Specify the method
             headers: {
                'Content-Type': 'application/json' // Set the content type header
             },
+            credentials: 'include',
             body: JSON.stringify(values) // Convert the JavaScript object to a JSON string
          })
          let result = await response.json();

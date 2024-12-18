@@ -14,6 +14,7 @@ import { useOrderContext } from "@/context/orderContext";
 import type { orderContextType } from "@/context/orderContext"
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { restaurant_id } from "@/lib/placeHolderData";
 
 let orders: any;
 const CartItem = () => {
@@ -31,7 +32,7 @@ const CartItem = () => {
       };
 
       const ordersString = JSON.stringify(ordersWithUserId);
-      localStorage.setItem('orders', ordersString);
+      localStorage.setItem(`${restaurant_id}_orders`, ordersString);
       // console.log("totalOrder after edit from cart", ordersWithUserId,);
       console.log("hello")
    }, [orders]);
@@ -209,7 +210,7 @@ const CartItem = () => {
 
 
                         </div>
-                        : ""}
+                        : ''}
                   </div>
                )
             })

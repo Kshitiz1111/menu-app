@@ -40,7 +40,9 @@ import { ProductFormSchema } from "@/lib/validator"
 import { z } from "zod"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
+import { restaurant_id } from "@/lib/placeHolderData"
 // import type { orderContextType } from "@/context/orderContext"
+
 
 interface Product {
    baseing_ids: number[] | null;
@@ -66,7 +68,7 @@ const DishCard = () => {
 
    async function getProducts() {
       try {
-         let response = await fetch("/api/product", {
+         let response = await fetch("/api/customer/product", {
             method: 'GET', // Specify the method
             headers: {
                'Content-Type': 'application/json' // Set the content type header
@@ -137,7 +139,7 @@ const DishCard = () => {
       };
 
       const ordersString = JSON.stringify(ordersWithUserId);
-      localStorage.setItem('orders', ordersString);
+      localStorage.setItem(`${restaurant_id}_orders`, ordersString);
 
       console.log("totalOrder", ordersWithUserId,);
 

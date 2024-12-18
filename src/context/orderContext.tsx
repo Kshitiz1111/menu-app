@@ -1,4 +1,5 @@
 "use client"
+import { restaurant_id } from "@/lib/placeHolderData";
 import { ProductFormSchema } from "@/lib/validator";
 import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 import { z } from "zod";
@@ -13,7 +14,7 @@ const OrderContext = createContext<orderContextType | []>([]);;
 const loadOrdersFromLocalStorage = () => {
    // Check if the code is running in a browser environment
    if (typeof window !== 'undefined') {
-      const ordersString = localStorage.getItem('orders');
+      const ordersString = localStorage.getItem(`${restaurant_id}_orders`);
 
       return ordersString ? JSON.parse(ordersString).orders : [];
    }
