@@ -88,12 +88,14 @@ const OrderBtn = () => {
    const handlePayment = async () => {
       try {
          let response = await khaltiPay(paymentPayload);
-         if (!response?.ok) {
-            throw new Error("Payment initiation failed");
+         console.log("response", response);
+         if (response?.status != 200) {
+            throw new Error("Payment initiation failed", response);
          }
 
-         const data = await response.json();
-         if (response.ok) {
+         const data = await response?.data;
+         console.log("data", data);
+         if (response?.status === 200) {
             // Parse the URL
             let sanitizedUrl = validateAndSanitizeUrl(data.payment_url);
             if (sanitizedUrl) {
